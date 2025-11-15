@@ -1,0 +1,11 @@
+{
+  "@context": ["https://www.w3.org/ns/did/v1"],
+  "id": "did:web:iu.schema:issuers:principle",
+  "verificationMethod": [{
+    "id": "did:web:iu.schema:issuers:principle:z6Mki...yourPublicKey...",
+    "type": "Ed25519VerificationKey2020",
+    "controller": "did:web:iu.schema:issuers:principle",
+    "publicKeyMultibase": "z6Mki...yourPublicKey..."
+  }],
+  "assertionMethod": ["did:web:iu.schema:issuers:principle:z6Mki...yourPublicKey..."]
+}

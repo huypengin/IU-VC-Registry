@@ -137,3 +137,47 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Node.js
+node_modules/
+dist/
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# SSL Certificates (keep private)
+certs/*.key
+certs/*.pem
+certs/*.p12
+
+# Cryptographic Keys (NEVER commit private keys)
+keys/ed25519-private.pem
+keys/*.key
+keys/*.pem
+
+# Application data
+data/
+*.db
+*.sqlite
+
+# Docker
+.docker/
+
+# IDE
+.idea/
+!.idea/typescript-compiler.xml
+.vscode/
+*.swp
+*.swo
+.github/*
+
+# OS
+.DS_Store
+Thumbs.db
