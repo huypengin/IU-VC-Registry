@@ -1,0 +1,42 @@
+{
+  "@context": {
+    "@version": 1.1,
+
+    "id": "@id",
+    "type": "@type",
+
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "vnEdu": "https://example.edu.vn/vocab/vn-edu#",
+
+    "Student": "vnEdu:Student",
+    "EducationalOrganization": "schema:CollegeOrUniversity",
+
+    "studentId": "vnEdu:studentId",
+    "nationalId": "vnEdu:nationalId",
+    "email": "schema:email",
+    "phoneNumber": "schema:telephone",
+
+    "givenName": "schema:givenName",
+    "familyName": "schema:familyName",
+    "fullName": "schema:name",
+    "dateOfBirth": {
+      "@id": "schema:birthDate",
+      "@type": "xsd:date"
+    },
+
+    "institution": {
+      "@id": "vnEdu:institution",
+      "@type": "@id"
+    },
+    "institutionName": "schema:name",
+    "institutionId": "vnEdu:institutionId",
+    "institutionAddress": "schema:address",
+
+    "issueDate": {
+      "@id": "schema:dateIssued",
+      "@type": "xsd:date"
+    },
+    "language": "schema:inLanguage"
+  }
+}

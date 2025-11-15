@@ -1,0 +1,55 @@
+{
+  "@context": {
+    "@version": 1.1,
+
+    "id": "@id",
+    "type": "@type",
+
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "vnEdu": "https://vc-registry.test/vocab/vn-edu#",
+
+    "TranscriptCredential": "vnEdu:TranscriptCredential",
+    "CourseResult": "vnEdu:CourseResult",
+
+    "transcriptId": "vnEdu:transcriptId",
+    "enrolmentId": "vnEdu:enrolmentId",
+
+    "courseResults": {
+      "@id": "vnEdu:courseResults",
+      "@container": "@set"
+    },
+
+    "courseCode": "vnEdu:courseCode",
+    "courseTitle": "vnEdu:courseTitle",
+    "credits": {
+      "@id": "vnEdu:credits",
+      "@type": "xsd:decimal"
+    },
+    "courseType": "vnEdu:courseType",
+
+    "term": "vnEdu:term",
+    "academicYear": "vnEdu:academicYear",
+
+    "grade": "vnEdu:grade",
+    "gradePoint": {
+      "@id": "vnEdu:gradePoint",
+      "@type": "xsd:decimal"
+    },
+    "passOrFail": "vnEdu:passOrFail",
+
+    "cumulativeGPA": {
+      "@id": "vnEdu:cumulativeGPA",
+      "@type": "xsd:decimal"
+    },
+    "totalCompletedCredits": {
+      "@id": "vnEdu:totalCompletedCredits",
+      "@type": "xsd:decimal"
+    },
+
+    "transcriptIssueDate": {
+      "@id": "vnEdu:transcriptIssueDate",
+      "@type": "xsd:date"
+    }
+  }
+}
