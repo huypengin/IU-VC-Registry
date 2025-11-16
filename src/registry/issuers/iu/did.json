@@ -15,7 +15,7 @@
       "id": "did:web:vc.example.vn:iu#signing-key-1",
       "type": "Ed25519VerificationKey2020",
       "controller": "did:web:vc.example.vn:iu",
-      "publicKeyMultibase": "zREPLACE_WITH_ED25519_PUBLIC_KEY"
+      "publicKeyMultibase": "z6MkuVoKNwovvx74Pu94VZcMTAHjD42sf89C7MvQFjYhcfP6"
     },
     {
       "id": "did:web:vc.example.vn:iu#eth-account-1",
