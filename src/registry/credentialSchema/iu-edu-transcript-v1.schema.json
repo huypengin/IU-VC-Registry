@@ -1,0 +1,284 @@
+{
+  "$id": "https://vc.example.vn/schemas/iu-edu-transcript-v1.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IU Education Transcript Verifiable Credential v1",
+  "type": "object",
+  "additionalProperties": true,
+
+  "properties": {
+    "@context": {
+      "description": "VC contexts including W3C VC v2 and IU custom contexts.",
+      "type": "array",
+      "items": {
+        "type": ["string", "object"]
+      },
+      "minItems": 1
+    },
+
+    "id": {
+      "description": "Optional VC identifier.",
+      "type": "string",
+      "format": "uri"
+    },
+
+    "type": {
+      "description": "VC types, must include VerifiableCredential and IU transcript type.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+
+    "issuer": {
+      "description": "Issuer of the credential.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uri"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": true
+        }
+      ]
+    },
+
+    "issuanceDate": {
+      "description": "Date/time when the credential becomes valid.",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "validFrom": {
+      "description": "Alternative validity start (VC 2.0).",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "validUntil": {
+      "description": "Optional validity end.",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "name": {
+      "description": "Human-readable name of the credential.",
+      "type": "string"
+    },
+
+    "description": {
+      "description": "Short description of the credential purpose.",
+      "type": "string"
+    },
+
+    "credentialSchema": {
+      "description": "Self-reference to this JSON Schema.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "type"],
+      "additionalProperties": true
+    },
+
+    "credentialStatus": {
+      "description": "Status object.",
+      "type": "object"
+    },
+
+    "credentialSubject": {
+      "description": "IU transcript-specific subject data.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "description": "Subject identifier, often a DID.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Subject type, e.g. Student.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+
+        "studentId": {
+          "description": "Internal IU student identifier.",
+          "type": "string"
+        },
+        "fullName": {
+          "description": "Full legal name of the student.",
+          "type": "string"
+        },
+        "givenName": {
+          "description": "Given name(s).",
+          "type": "string"
+        },
+        "familyName": {
+          "description": "Family name.",
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "description": "Date of birth (YYYY-MM-DD).",
+          "type": "string",
+          "format": "date"
+        },
+
+        "institution": {
+          "description": "Reference to the institution (DID/URL).",
+          "type": "string"
+        },
+        "institutionName": {
+          "description": "Human-readable institution name.",
+          "type": "string"
+        },
+        "institutionId": {
+          "description": "Internal institution code/id.",
+          "type": "string"
+        },
+
+        "transcriptId": {
+          "description": "Internal transcript identifier.",
+          "type": "string"
+        },
+        "enrolmentId": {
+          "description": "Identifier tying this transcript to an enrolment record.",
+          "type": "string"
+        },
+
+        "academicYear": {
+          "description": "Academic year label (e.g. 2024-2025).",
+          "type": "string"
+        },
+        "term": {
+          "description": "Term/semester label (e.g. Fall, Spring, HK1).",
+          "type": "string"
+        },
+
+        "courseResults": {
+          "description": "List of course-level results.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "type": {
+                "description": "Course result type (e.g. CourseResult).",
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "courseCode": {
+                "description": "Internal course code.",
+                "type": "string"
+              },
+              "courseTitle": {
+                "description": "Course title in transcript.",
+                "type": "string"
+              },
+              "credits": {
+                "description": "Credit value of the course.",
+                "type": "number"
+              },
+              "courseType": {
+                "description": "Course type (core, elective, etc.).",
+                "type": "string"
+              },
+              "academicYear": {
+                "description": "Year when the course was taken.",
+                "type": "string"
+              },
+              "term": {
+                "description": "Term when the course was taken.",
+                "type": "string"
+              },
+              "grade": {
+                "description": "Grade symbol (e.g. A, B+, 9.0).",
+                "type": "string"
+              },
+              "gradePoint": {
+                "description": "Numeric grade point.",
+                "type": "number"
+              },
+              "passOrFail": {
+                "description": "Pass/Fail indicator.",
+                "type": "string"
+              }
+            },
+            "required": ["courseCode", "courseTitle", "credits", "grade"]
+          }
+        },
+
+        "cumulativeGPA": {
+          "description": "Cumulative GPA at the time of transcript.",
+          "type": "number"
+        },
+        "totalCompletedCredits": {
+          "description": "Total completed credits.",
+          "type": "number"
+        },
+
+        "transcriptIssueDate": {
+          "description": "Date when the transcript was issued.",
+          "type": "string",
+          "format": "date"
+        },
+
+        "language": {
+          "description": "Language used in the transcript (e.g. vi, en).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "studentId",
+        "fullName",
+        "transcriptId",
+        "academicYear",
+        "courseResults"
+      ]
+    },
+
+    "proof": {
+      "description": "Proof object (JSON-LD Data Integrity / JOSE / COSE).",
+      "type": "object"
+    }
+  },
+
+  "required": ["@context", "type", "issuer", "credentialSubject"]
+}

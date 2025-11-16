@@ -1,13 +1,13 @@
 {
   "@context": {
-    "@version": 1.1,
+    "@version": 1.0,
 
     "id": "@id",
     "type": "@type",
 
     "schema": "https://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "vnEdu": "https://example.edu.vn/vocab/vn-edu#",
+    "vnEdu": "https://vc-registry.test/vocab/vn-edu#",
 
     "DegreeCredential": "vnEdu:DegreeCredential",
 
