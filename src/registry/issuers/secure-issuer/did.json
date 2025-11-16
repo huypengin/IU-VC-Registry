@@ -1,0 +1,17 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1"
+  ],
+  "id": "did:web:secure.example.com",
+  "verificationMethod": [
+    {
+      "id": "did:web:secure.example.com:z6MkuVoKNwovvx74Pu94VZcMTAHjD42sf89C7MvQFjYhcfP6",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:web:secure.example.com",
+      "publicKeyMultibase": "z6MkuVoKNwovvx74Pu94VZcMTAHjD42sf89C7MvQFjYhcfP6"
+    }
+  ],
+  "assertionMethod": [
+    "did:web:secure.example.com:z6MkuVoKNwovvx74Pu94VZcMTAHjD42sf89C7MvQFjYhcfP6"
+  ]
+}
