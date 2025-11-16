@@ -5,7 +5,7 @@
 
 import { generateKeyPairSync, createPublicKey, createPrivateKey } from 'crypto';
 import { readFileSync, writeFileSync } from 'fs';
-import { publickeyToMultibase } from './convert-key';
+import { publickeyToMultibase } from './convert-key.js';
 
 export interface Ed25519KeyPair {
   publicKey: Uint8Array;

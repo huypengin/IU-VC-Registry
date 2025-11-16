@@ -72,7 +72,6 @@ web_modules/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
-.parcel-cache
 
 # Next.js build output
 .next
@@ -139,18 +138,18 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Node.js
-node_modules/
-dist/
-*.log
-npm-debug.log*
+# node_modules/
+# dist/
+# *.log
+# npm-debug.log*
 
 # TypeScript
-*.tsbuildinfo
+# *.tsbuildinfo
 
 # Environment files
-.env
-.env.local
-.env.*.local
+# .env
+# .env.local
+# .env.*.local
 
 # SSL Certificates (keep private)
 certs/*.key
@@ -181,3 +180,10 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+ # DID / Key generation artifacts (NEVER commit private or encrypted key material)
+**/ed25519.keys.json
+**/ed25519.encrypted.json
+# Allow sample/public templates if needed by renaming with .example
+# DID documents generated per issuer (optional ignore - comment out if you want them tracked)
+# **/did.json

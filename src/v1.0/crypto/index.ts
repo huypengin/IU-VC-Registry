@@ -3,5 +3,6 @@
  * Central module for all cryptographic operations
  */
 
-export * from './ed25519';
-export * from './convert-key';
+export * from './ed25519.js';
+export * from './convert-key.js';
+export * from './key-manager.js';

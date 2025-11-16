@@ -3,15 +3,15 @@
  * Creates and manages W3C DID Documents
  */
 
-import { DIDDocument, DIDCreationOptions, VerificationMethod } from '../types/did';
+import { DIDDocument, VerificationMethod } from '../types/did';
+
+const DEFAULT_DID_SUFFIX = 'helena-unda-bounceably.ngrok-free.dev:issuers:principle';
 
 /**
  * Build a complete DID document from options
  */
 export function buildDIDDocument(publicKeyMultibase: string, domain?: string): DIDDocument {
-  // Use your specific Ngrok domain
-  const didDomain = "helena-unda-bounceably.ngrok-free.dev";
-  const didId = `did:web:${didDomain}:issuers:principle`;
+  const didId = resolveDidIdentifier(domain);
   const keyId = `${didId}:${publicKeyMultibase}`;
 
   // Create verification method
@@ -31,6 +31,19 @@ export function buildDIDDocument(publicKeyMultibase: string, domain?: string): D
   };
 
   return didDocument;
+}
+
+function resolveDidIdentifier(domain?: string): string {
+  if (!domain || !domain.trim()) {
+    return `did:web:${DEFAULT_DID_SUFFIX}`;
+  }
+
+  const trimmed = domain.trim();
+  if (trimmed.startsWith('did:')) {
+    return trimmed;
+  }
+
+  return `did:web:${trimmed}`;
 }
 
 /**

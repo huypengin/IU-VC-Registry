@@ -6,54 +6,95 @@ A complete TypeScript Node.js system for creating and serving W3C DID (Decentral
 
 This system implements three main components for DID creation:
 
-### 1. 🔑 Ed25519 Key Generation (`src/crypto/`)
+### 1. 🔑 Ed25519 Key Generation (`src/v1.0/crypto/`)
 - Generate new Ed25519 keypairs
+- Encrypt private keys with AES-256-GCM + scrypt KDF
 - Load/save keys from PEM files
 - Convert public keys to multibase format
 
-### 2. 📄 DID Document Builder (`src/did/`)
+### 2. 📄 DID Document Builder (`src/v1.0/did/`)
 - Create W3C compliant DID documents
 - Support for verification methods
 - JSON serialization and validation
+- Configurable DID domains
 
-### 3. 🌐 HTTPS Server (`src/server/`)
+### 3. 🌐 HTTPS Server (`src/v1.0/server/`)
 - Express.js HTTPS server
 - Docker containerization
 - Ngrok tunneling for public access
+
+### 4. 🔧 Key Generator CLI (`src/registry/issuers/helper/`)
+- Generate Ed25519 keys and DID documents
+- Optional passphrase-based encryption
+- Automatic injection into issuer DID documents
 
 ## 📁 Project Structure
 
 ```
 ├── src/
-│   ├── app.ts                    # Main application orchestrator
-│   ├── crypto/
-│   │   ├── index.ts              # Crypto module exports
-│   │   ├── ed25519.ts            # Ed25519 key generation
-│   │   └── convert-key.ts        # Key format conversion
-│   ├── did/
-│   │   ├── index.ts              # DID module exports
-│   │   └── builder.ts            # DID document creation
-│   ├── server/
-│   │   ├── index.ts              # Server module exports
-│   │   └── https-server.ts       # HTTPS server with SSL/TLS
-│   └── types/
-│       ├── multiformats.d.ts     # External type declarations
-│       └── did.ts                # DID document types
+│   ├── app.ts                                  # Main application orchestrator
+│   ├── v1.0/
+│   │   ├── crypto/
+│   │   │   ├── index.ts                        # Crypto module exports
+│   │   │   ├── ed25519.ts                      # Ed25519 key generation
+│   │   │   ├── convert-key.ts                  # Key format conversion
+│   │   │   └── key-manager.ts                  # Key encryption/decryption
+│   │   ├── did/
+│   │   │   ├── index.ts                        # DID module exports
+│   │   │   └── builder.ts                      # DID document creation
+│   │   ├── server/
+│   │   │   ├── index.ts                        # Server module exports
+│   │   │   └── https-server.ts                 # HTTPS server with SSL/TLS
+│   │   └── types/
+│   │       ├── multiformats.d.ts               # External type declarations
+│   │       └── did.ts                          # DID document types
+│   └── registry/
+│       └── issuers/
+│           └── helper/
+│               └── keyGenerator.ts              # CLI for key generation
+├── tests/
+│   └── crypto/
+│       └── key-manager.spec.ts                  # Key encryption tests
+├── .github/
+│   └── docs/
+│       └── key-generator-guide.md               # Key generator documentation
 ├── docker/
-│   ├── Dockerfile                # Container configuration
-│   └── docker-compose.yml        # Multi-service orchestration
-├── certs/                        # SSL certificates (gitignored)
-├── keys/                         # Ed25519 keys (gitignored)
-├── data/                         # Application data (gitignored)
-├── dist/                         # Compiled JavaScript
-├── index.ts                      # Application entry point
-├── .env.example                  # Environment configuration template
-└── README.md                     # This file
+│   ├── Dockerfile                               # Container configuration
+│   └── docker-compose.yml                       # Multi-service orchestration
+├── certs/                                       # SSL certificates (gitignored)
+├── keys/                                        # Ed25519 keys (gitignored)
+├── data/                                        # Application data (gitignored)
+├── dist/                                        # Compiled JavaScript
+├── index.ts                                     # Application entry point
+├── .env.example                                 # Environment configuration template
+└── README.md                                    # This file
 ```
 
-## 🚀 Available Commands
+## 🚀 Quick Start
 
-### Development
+### Generate Keys and DID Document
+
+The fastest way to get started is to generate keys and a DID document:
+
+```powershell
+# Install dependencies
+npm install
+
+# Generate keys for default issuer (iu)
+npm run generate:issuer
+
+# Generate with custom domain
+npm run generate:issuer -- --did-domain "vc.example.vn:iu"
+
+# Generate with encrypted keys
+npm run generate:issuer -- --encrypted --passphrase "your-secure-passphrase"
+```
+
+📖 **[Full Key Generator Guide](.github/docs/key-generator-guide.md)**
+
+### Available Commands
+
+#### Development
 ```bash
 # Install dependencies
 npm install
@@ -66,9 +107,24 @@ npm run build
 
 # Run production build
 npm start
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
-### Docker Deployment
+#### Key Generation
+```bash
+# Generate issuer keys and DID document
+npm run generate:issuer
+
+# Generate with custom options
+npm run generate:issuer -- --did-domain "example.com" --issuer "university-a" --encrypted --passphrase "pass"
+```
+
+#### Docker Deployment
 ```bash
 # Build Docker image
 npm run docker:build
@@ -101,59 +157,94 @@ NGROK_AUTHTOKEN=your_token_here
 # DID configuration
 DID_METHOD=web
 DID_DOMAIN=your-domain.com
+
+# Key encryption (optional)
+KEY_ENCRYPTION_PASSPHRASE=your-secure-passphrase
 ```
 
 ## 🔐 Security Features
 
 - **Ed25519 Cryptography**: Modern elliptic curve signatures
+- **AES-256-GCM Encryption**: Secure private key encryption with authenticated encryption
+- **Scrypt KDF**: Password-based key derivation with configurable cost
 - **HTTPS/TLS**: Encrypted communication
 - **Docker Security**: Containerized execution with non-root user
-- **Private Key Protection**: Keys are gitignored and containerized
+- **Private Key Protection**: Keys are gitignored and optionally encrypted
 - **Environment Variables**: Sensitive config via environment
+- **Repository Hygiene**: Raw (`ed25519.keys.json`) and encrypted (`ed25519.encrypted.json`) key bundles are ignored via `.gitignore`. If you need to publish an example, rename it to `ed25519.keys.example.json` and strip the private key.
 
-## 📋 Implementation Checklist
+## 📖 Documentation
 
-### Phase 1: Crypto Module
-- [ ] Implement Ed25519 key generation
-- [ ] Add PEM file loading/saving
-- [ ] Test multibase conversion
+- **[Key Generator Guide](.github/docs/key-generator-guide.md)** - Complete guide for generating keys and DID documents
+- **[Coding Convention](.github/docs/coding-convention.md)** - Project coding standards
+- **[Testing Convention](.github/docs/testing-convention.md)** - Testing guidelines
 
-### Phase 2: DID Document
-- [ ] Build DID document structure
-- [ ] Add verification methods
-- [ ] Implement validation
+## 🧪 Testing
 
-### Phase 3: HTTPS Server
-- [ ] Setup Express.js with HTTPS
-- [ ] Configure SSL certificates
-- [ ] Integrate Ngrok tunneling
-- [ ] Add Docker support
+The project uses Vitest for testing:
 
-## 🛠️ Technology Stack
+```bash
+# Run all tests
+npm test
 
-- **Runtime**: Node.js v20+ with TypeScript
-- **Crypto**: Ed25519 (via Node.js crypto module)
-- **Server**: Express.js with HTTPS
-- **Containerization**: Docker + Docker Compose
-- **Public Access**: Ngrok tunneling
-- **Standards**: W3C DID Core specification
+# Run tests in watch mode
+npm run test:watch
+```
 
-## 📄 DID Document Format
+Current test coverage:
+- ✅ Key encryption/decryption with AES-256-GCM
+- ✅ Scrypt parameter validation
+- ✅ Passphrase verification
 
-The system creates DID documents following W3C standards:
+## 📋 Key Generator CLI
+
+### Basic Usage
+
+```powershell
+# Generate unencrypted keys
+npm run generate:issuer
+
+# Generate encrypted keys
+npm run generate:issuer -- --encrypted --passphrase "secure-pass"
+
+# Custom domain and issuer
+npm run generate:issuer -- --did-domain "university.edu:dept" --issuer "dept-cs"
+```
+
+### CLI Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--did-domain <domain>` | DID domain or full identifier | `helena-unda-bounceably.ngrok-free.dev:issuers:principle` |
+| `--output <dir>` | Output directory for artifacts | `./src/registry/issuers/{issuer}` |
+| `--issuer <name>` | Issuer folder name | `iu` |
+| `--passphrase <pass>` | Passphrase for encryption | Environment variable |
+| `--encrypted` | Enable key encryption | `false` |
+
+### Output Files
+
+**Unencrypted:**
+- `did.json` - W3C compliant DID document
+- `ed25519.keys.json` - Raw key material (base64-encoded)
+
+**Encrypted:**
+- `did.json` - W3C compliant DID document
+- `ed25519.encrypted.json` - Encrypted key bundle with scrypt parameters
+
+### Example Output
 
 ```json
 {
-  "@context": "https://www.w3.org/ns/did/v1",
-  "id": "did:web:domain.com",
+  "@context": ["https://www.w3.org/ns/did/v1"],
+  "id": "did:web:vc.example.vn:iu",
   "verificationMethod": [{
-    "id": "did:web:domain.com#key-1",
+    "id": "did:web:vc.example.vn:iu:z6Mk...",
     "type": "Ed25519VerificationKey2020",
-    "controller": "did:web:domain.com",
+    "controller": "did:web:vc.example.vn:iu",
     "publicKeyMultibase": "z6Mk..."
   }],
-  "authentication": ["#key-1"]
+  "assertionMethod": ["did:web:vc.example.vn:iu:z6Mk..."]
 }
 ```
 
-Your DID creation system is now fully structured and ready for implementation!
+📖 **See [Key Generator Guide](.github/docs/key-generator-guide.md) for detailed examples and troubleshooting**

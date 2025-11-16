@@ -2,10 +2,14 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./",
+    "paths": {
+      "src/*": ["./src/*"],
+      "src/v1.0/*": ["./src/v1.0/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -23,7 +27,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "index.ts"
+    "index.ts",
+    "tools/**/*.ts"
   ],
   "exclude": [
     "node_modules",
