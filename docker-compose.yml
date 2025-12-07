@@ -1,0 +1,11 @@
+version: '3.8'
+    restart: unless-stopped
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./site:/usr/share/nginx/html:ro
+    volumes:
+      - "8080:80"
+    ports:
+    image: nginx:stable-alpine
+  nginx:
+services:
+

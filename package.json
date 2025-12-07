@@ -14,7 +14,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "generate:issuer": "npm run build && node ./dist/src/registry/issuers/helper/keyGenerator.js generate",
-    "generate:issuer:dev": "node --loader ts-node/esm ./src/registry/issuers/helper/keyGenerator.ts generate"
+    "generate:issuer:dev": "node --loader ts-node/esm ./src/registry/issuers/helper/keyGenerator.ts generate",
+    "registry:validate": "node --loader ts-node/esm tools/registry-cli.ts validate",
+    "registry:build": "node --loader ts-node/esm tools/registry-cli.ts build"
   },
   "keywords": [],
   "author": "",

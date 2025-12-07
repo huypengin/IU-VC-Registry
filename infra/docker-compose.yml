@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  vc-registry-web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.nginx
+    container_name: iu-did-web-static
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - vc-network
+
+networks:
+  vc-network:
+    driver: bridge

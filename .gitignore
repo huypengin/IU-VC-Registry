@@ -187,3 +187,17 @@ Thumbs.db
 # Allow sample/public templates if needed by renaming with .example
 # DID documents generated per issuer (optional ignore - comment out if you want them tracked)
 # **/did.json
+
+# Explicitly never commit any generated or private key files
+**/*.keys.json
+**/*.encrypted.json
+**/*.private.json
+**/*.key.json
+# Already covered but keep explicit
+**/ed25519.keys.json
+**/ed25519.encrypted.json
+
+# Never commit DID private artifacts
+**/*.keys
+**/*.pem
+**/*.key

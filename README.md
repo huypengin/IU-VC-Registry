@@ -136,6 +136,25 @@ npm run docker:run
 npm run docker:stop
 ```
 
+#### Typical workflow:
+```bash
+# 1. Validate all contexts, schemas, DID docs
+npm run registry:validate
+# or
+yarn registry:validate
+
+# 2. Build the public/ folder
+npm run registry:build
+# or
+yarn registry:build
+
+# 3. Build & run Docker (serving public/)
+docker compose -f infra/docker-compose.yml up --build
+
+# 4. Expose with ngrok
+ngrok http 8080
+```
+
 ## ⚙️ Configuration
 
 Copy `.env.example` to `.env` and configure:
@@ -248,3 +267,45 @@ npm run generate:issuer -- --did-domain "university.edu:dept" --issuer "dept-cs"
 ```
 
 📖 **See [Key Generator Guide](.github/docs/key-generator-guide.md) for detailed examples and troubleshooting**
+
+## How to use `vc-registry generate`
+
+This project provides a small CLI to validate the registry, generate key material for an issuer, inject the resulting DID document and keys into the registry source tree, and copy the registry into `public/` so it can be served as static files.
+
+There are two convenient ways to run the command:
+
+1) Using the project CLI directly (recommended for development):
+
+```powershell
+# Validate registry files
+node --loader ts-node/esm tools/registry-cli.ts validate
+
+# Generate keys for an issuer (writes into src/registry/issuers/<issuer> and then copies to public/)
+node --loader ts-node/esm tools/registry-cli.ts generate --issuer iu --did-domain vc.example.vn
+
+# Skip the build-to-public step if you only want to create files under src/
+node --loader ts-node/esm tools/registry-cli.ts generate --issuer iu --no-build
+```
+
+2) Via npm scripts (shortcut wrappers defined in package.json):
+
+```powershell
+# Validate
+npm run registry:validate
+
+# Build (copy src/registry -> public)
+npm run registry:build
+```
+
+Notes
+- The `generate` command will by default run the `build` step after generation to update `public/`. Use `--no-build` to skip copying to `public/`.
+- Generated private key files (e.g. `ed25519.keys.json`, `ed25519.encrypted.json`) are explicitly ignored in `.gitignore`. Never commit them.
+- When running inside Docker build (the provided `infra/Dockerfile.nginx`), the builder stage uses `node --loader ts-node/esm` so TS entrypoints run correctly.
+
+If you want a short alias, you can add a script to `package.json`:
+
+```json
+"scripts": {
+  "vc:generate": "node --loader ts-node/esm tools/registry-cli.ts generate"
+}
+```
