@@ -92,6 +92,32 @@ npm run generate:issuer -- --encrypted --passphrase "your-secure-passphrase"
 
 📖 **[Full Key Generator Guide](.github/docs/key-generator-guide.md)**
 
+### Quick Start with Docker & ngrok
+
+Deploy your DID documents as a static web server and expose them with a real domain:
+
+```powershell
+# 1. One-command start (validates, builds, and starts Docker)
+npm run docker:start
+
+# 2. In another terminal, test the deployment
+npm run docker:test
+
+# 3. (Optional) Expose with ngrok for a real public domain
+#    First install ngrok: choco install ngrok
+#    Then authenticate: ngrok config add-authtoken YOUR_TOKEN
+#    Finally start tunnel:
+ngrok http 8080
+```
+
+Your DID documents will be accessible at:
+- **Local**: `http://localhost:8080/issuers/iu/did.json`
+- **Public** (with ngrok): `https://abc123.ngrok-free.app/issuers/iu/did.json`
+- **DID Identifier**: `did:web:abc123.ngrok-free.app:issuers:iu`
+
+📖 **[Full Docker Deployment Guide](.github/docs/docker-deployment-guide.md)**
+📖 **[ngrok Setup Guide](.github/docs/ngrok-setup-guide.md)**
+
 ### Available Commands
 
 #### Development
@@ -126,34 +152,45 @@ npm run generate:issuer -- --did-domain "example.com" --issuer "university-a" --
 
 #### Docker Deployment
 ```bash
+# One-command start (validate + build + docker up)
+npm run docker:start
+
+# Test the deployment endpoints
+npm run docker:test
+
+# Or run steps manually:
 # Build Docker image
 npm run docker:build
 
-# Start with Docker Compose
-npm run docker:run
+# Build and start with Docker Compose (foreground with logs)
+npm run docker:up
+
+# Build and start in background (detached mode)
+npm run docker:up:detached
+
+# View logs (when running in detached mode)
+npm run docker:logs
 
 # Stop Docker services
-npm run docker:stop
+npm run docker:down
 ```
 
 #### Typical workflow:
 ```bash
 # 1. Validate all contexts, schemas, DID docs
 npm run registry:validate
-# or
-yarn registry:validate
 
 # 2. Build the public/ folder
 npm run registry:build
-# or
-yarn registry:build
 
 # 3. Build & run Docker (serving public/)
-docker compose -f infra/docker-compose.yml up --build
+npm run docker:up
 
-# 4. Expose with ngrok
+# 4. (In another terminal) Expose with ngrok
 ngrok http 8080
 ```
+
+📖 **[Full Docker Deployment & ngrok Guide](.github/docs/docker-deployment-guide.md)**
 
 ## ⚙️ Configuration
 
@@ -194,7 +231,11 @@ KEY_ENCRYPTION_PASSPHRASE=your-secure-passphrase
 
 ## 📖 Documentation
 
+- **[Getting Started - Complete Tutorial](.github/docs/getting-started.md)** - Step-by-step guide for first-time users
+- **[Quick Reference Card](.github/docs/quick-reference.md)** - One-page command reference
 - **[Key Generator Guide](.github/docs/key-generator-guide.md)** - Complete guide for generating keys and DID documents
+- **[Docker Deployment Guide](.github/docs/docker-deployment-guide.md)** - Complete guide for Docker deployment and ngrok setup
+- **[ngrok Setup Guide](.github/docs/ngrok-setup-guide.md)** - Quick guide for exposing your server with ngrok
 - **[Coding Convention](.github/docs/coding-convention.md)** - Project coding standards
 - **[Testing Convention](.github/docs/testing-convention.md)** - Testing guidelines
 

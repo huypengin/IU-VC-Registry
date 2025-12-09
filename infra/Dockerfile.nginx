@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile: build static site with Node then serve with nginx
 
-# ---------- Stage: builder (Node) ----------
+# ---------- Stage: builder (Node) ----------         
 FROM node:20-alpine AS builder
 
 RUN apk add --no-cache libc6-compat
