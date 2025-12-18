@@ -1,0 +1,55 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@protected": true,
+
+    "id": "@id",
+    "type": "@type",
+
+    "sec": "https://w3id.org/security#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+
+    "StatusList2021Credential": {
+      "@id": "sec:StatusList2021Credential",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "credentialSubject": {
+          "@id": "sec:credentialSubject",
+          "@type": "@id"
+        }
+      }
+    },
+
+    "StatusList2021": {
+      "@id": "sec:StatusList2021",
+      "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "statusPurpose": "sec:statusPurpose",
+        "encodedList": "sec:encodedList",
+        "statusListIndex": "sec:statusListIndex"
+      }
+    },
+
+    "statusPurpose": {
+      "@id": "sec:statusPurpose",
+      "@type": "xsd:string"
+    },
+
+    "encodedList": {
+      "@id": "sec:encodedList",
+      "@type": "xsd:string"
+    },
+
+    "statusListCredential": {
+      "@id": "sec:statusListCredential",
+      "@type": "@id"
+    },
+
+    "statusListIndex": {
+      "@id": "sec:statusListIndex",
+      "@type": "xsd:integer"
+    }
+  }
+}

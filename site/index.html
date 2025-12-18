@@ -7,6 +7,17 @@
 <body>
   <h1>Hello from nginx in Docker</h1>
   <p>Requests -> nginx -> site folder</p>
+  <section>
+    <h2>StatusList2021 (base64 bitstring)</h2>
+    <p>All credentials start as not revoked, so every bit is 0.</p>
+    <pre id="statuslist-output"></pre>
+  </section>
+  <script type="module" src="./statuslist2021.js"></script>
+  <script type="module">
+    import { createEmptyStatusList } from './statuslist2021.js';
+    document.getElementById('statuslist-output').textContent =
+      createEmptyStatusList().encodedList;
+  </script>
 </body>
 </html>
 

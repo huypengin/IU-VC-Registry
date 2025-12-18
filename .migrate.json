@@ -1,0 +1,7 @@
+{
+  "database-url": "postgres://iu_did_user:iu_did_password@localhost:5432/iu_did_db",
+  "migrations-dir": "migrations",
+  "dir": "migrations",
+  "migration-file-language": "js"
+}
+
