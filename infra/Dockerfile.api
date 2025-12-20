@@ -1,0 +1,26 @@
+# Dockerfile for Node.js API service
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --production
+
+# Copy source code
+COPY tsconfig.json ./
+COPY src ./src
+COPY migrations ./migrations
+
+# Build TypeScript
+RUN npm install -g typescript
+RUN tsc
+
+# Create directories for dynamic files
+RUN mkdir -p /app/public/status
+
+EXPOSE 3000
+
+# Run the registry server (serves API + writes status files)
+CMD ["node", "dist/src/registry-server.js"]
+

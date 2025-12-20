@@ -1,73 +1,78 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getStatusList } from './status-list-service.js';
+import { makeDocumentLoader, signAsDataIntegrity } from './di-signer.js';
+import { loadMultikeyFromEnv, getIssuerConfig } from '../v1.0/config/multikey.js';
 
 const PUBLIC_REGISTRY_PATH = path.resolve('public/status');
 
-/**
- * Publish a status list to the public registry
- * This creates a StatusList2021Credential JSON file that can be served via HTTPS
- */
+interface StatusList2021CredentialParams {
+  listId: string;
+  encodedList: string;
+  statusPurpose: string;
+}
+
 export async function publishStatusList(listId: string): Promise<void> {
   const statusList = await getStatusList(listId);
-  
-  if (!statusList) {
-    throw new Error(`Status list not found: ${listId}`);
-  }
+  if (!statusList) throw new Error(`Status list not found: ${listId}`);
 
-  // Parse listId to determine the file path
-  // Example: "slu-degree-2025" -> public/status/degree/2025/status-list.json
   const parts = listId.split('-');
   const category = parts[1] || 'general';
   const year = parts[2] || new Date().getFullYear().toString();
-  
+
   const dirPath = path.join(PUBLIC_REGISTRY_PATH, category, year);
   const filePath = path.join(dirPath, 'status-list.json');
-
-  // Ensure directory exists
   await fs.mkdir(dirPath, { recursive: true });
 
-  // Build StatusList2021Credential
-  const credential = buildStatusList2021Credential(listId, statusList.encodedList, statusList.statusPurpose);
+  const unsigned = buildUnsignedStatusList2021Credential({
+    listId,
+    encodedList: statusList.encodedList,
+    statusPurpose: statusList.statusPurpose
+  });
 
-  // Write to file (atomic overwrite)
-  await fs.writeFile(filePath, JSON.stringify(credential, null, 2), 'utf8');
+  const keyPairJson = loadMultikeyFromEnv();
+  const documentLoader = makeDocumentLoader({ extraDocuments: {} });
 
-  console.log(`✅ Published status list: ${listId} -> ${filePath}`);
+  const signed = await signAsDataIntegrity({
+    unsignedDocument: unsigned,
+    keyPairJson,
+    documentLoader
+  });
+
+  await fs.writeFile(filePath, JSON.stringify(signed, null, 2), 'utf8');
+  console.log(`✅ Published SIGNED status list: ${listId} -> ${filePath}`);
 }
 
-/**
- * Build a W3C StatusList2021Credential
- * Spec: https://w3c-ccg.github.io/vc-status-list-2021/
- */
-function buildStatusList2021Credential(
-  listId: string,
-  encodedList: string,
-  statusPurpose: string
-): any {
+function buildUnsignedStatusList2021Credential({
+  listId,
+  encodedList,
+  statusPurpose
+}: StatusList2021CredentialParams): any {
   const now = new Date().toISOString();
-  const domain = process.env.PUBLIC_DOMAIN || 'helena-unda-bounceably.ngrok-free.dev';
-  
-  // Parse listId to build the credential ID
+  const config = getIssuerConfig();
+
   const parts = listId.split('-');
   const category = parts[1] || 'general';
   const year = parts[2] || new Date().getFullYear().toString();
-  
+
+  const statusListUrl = `https://${config.publicDomain}/status/${category}/${year}/status-list.json`;
+
   return {
-    '@context': [
-      'https://www.w3.org/2018/credentials/v1',
-      `https://${domain}/contexts/vn-edu-statuslist-v1.jsonld`,
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://w3id.org/vc/status-list/2021/v1"
     ],
-    id: `https://${domain}/status/${category}/${year}/status-list.json`,
-    type: ['VerifiableCredential', 'StatusList2021Credential'],
-    issuer: `did:web:${domain.replace(/\./g, ':')}:issuers:iu`,
+    id: statusListUrl,
+    type: ["VerifiableCredential", "StatusList2021Credential"],
+    issuer: config.issuerDid,
     issuanceDate: now,
     credentialSubject: {
-      id: `https://${domain}/status/${category}/${year}/status-list.json#list`,
-      type: 'StatusList2021',
+      id: `${statusListUrl}#list`,
+      type: "StatusList2021",
       statusPurpose,
-      encodedList,
-    },
+      encodedList
+    }
   };
 }
+
 

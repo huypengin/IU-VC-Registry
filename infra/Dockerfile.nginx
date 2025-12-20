@@ -30,6 +30,9 @@ COPY infra/nginx.conf /etc/nginx/nginx.conf
 # Copy only the built static output from the builder stage into nginx webroot
 COPY --from=builder /app/public /usr/share/nginx/html
 
+# Create directory for dynamic status files (will be mounted as volume)
+RUN mkdir -p /usr/share/nginx/html/status
+
 EXPOSE 80
 
 # Start nginx in the foreground (docker-friendly)

@@ -1,55 +1,17 @@
 {
   "@context": [
-    "https://www.w3.org/ns/did/v1",
-    "https://w3id.org/security/suites/ed25519-2020/v1",
-    "https://w3id.org/security/suites/secp256k1-2019/v1"
+    "https://www.w3.org/ns/did/v1"
   ],
-  "id": "did:web:vc.example.vn:iu",
-  "alsoKnownAs": [
-    "https://www.hcmiu.edu.vn/"
-  ],
-  "controller": "did:web:vc.example.vn:iu",
-
+  "id": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu",
   "verificationMethod": [
     {
-      "id": "did:web:vc.example.vn:iu#signing-key-1",
+      "id": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu:z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS",
       "type": "Ed25519VerificationKey2020",
-      "controller": "did:web:vc.example.vn:iu",
-      "publicKeyMultibase": "z6MkuVoKNwovvx74Pu94VZcMTAHjD42sf89C7MvQFjYhcfP6"
-    },
-    {
-      "id": "did:web:vc.example.vn:iu#eth-account-1",
-      "type": "EcdsaSecp256k1RecoveryMethod2020",
-      "controller": "did:web:vc.example.vn:iu",
-      "ethereumAddress": "0xREPLACE_WITH_ETH_ADDRESS"
+      "controller": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu",
+      "publicKeyMultibase": "z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS"
     }
   ],
-
   "assertionMethod": [
-    "did:web:vc.example.vn:iu#signing-key-1"
-  ],
-  "authentication": [
-    "did:web:vc.example.vn:iu#signing-key-1"
-  ],
-
-  "service": [
-    {
-      "id": "did:web:vc.example.vn:iu#vc-issuance",
-      "type": "VerifiableCredentialIssuanceService",
-      "serviceEndpoint": {
-        "url": "https://vc.example.vn/api/issue",
-        "description": "IU VC issuance endpoint (future use)."
-      }
-    },
-    {
-      "id": "did:web:vc.example.vn:iu#anchoring",
-      "type": "AnchoringService",
-      "serviceEndpoint": {
-        "chainId": "eip155:11155111",
-        "networkName": "sepolia",
-        "contractAddress": "0xREPLACE_WITH_REGISTRY_CONTRACT",
-        "description": "Ethereum anchoring contract for IU degree/transcript Merkle roots."
-      }
-    }
+    "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu:z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS"
   ]
 }

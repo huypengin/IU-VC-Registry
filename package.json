@@ -31,6 +31,7 @@
     "test:watch": "vitest",
     "generate:issuer": "npm run build && node ./dist/src/registry/issuers/helper/keyGenerator.js generate",
     "generate:issuer:dev": "node --loader ts-node/esm ./src/registry/issuers/helper/keyGenerator.ts generate",
+    "generate:multikey:env": "node --loader ts-node/esm tools/generate-multikey-env.ts",
     "registry:validate": "node --loader ts-node/esm tools/registry-cli.ts validate",
     "registry:build": "node --loader ts-node/esm tools/registry-cli.ts build"
   },
@@ -39,6 +40,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@digitalbazaar/data-integrity": "^2.5.0",
+    "@digitalbazaar/ed25519-multikey": "^1.3.1",
+    "@digitalbazaar/eddsa-rdfc-2022-cryptosuite": "^1.2.0",
     "@types/pako": "^2.0.4",
     "@types/pg": "^8.16.0",
     "commander": "^11.1.0",
@@ -46,6 +50,7 @@
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "helmet": "^7.2.0",
+    "jsonld-signatures": "^11.5.0",
     "multiformats": "^13.4.1",
     "ngrok": "^5.0.0-beta.2",
     "node-pg-migrate": "^8.0.4",
