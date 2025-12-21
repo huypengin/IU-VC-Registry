@@ -7,6 +7,7 @@ export interface StatusList {
   encodedList: string;
   size: number;
   statusPurpose: string;
+  publicUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,25 +44,28 @@ export async function initStatusList(
   try {
     await client.query('BEGIN');
 
-    // Create initial bitstring (all zeros)
     const byteLength = Math.ceil(size / 8);
     const bitstring = new Uint8Array(byteLength);
 
-    // Compress with GZIP
     const compressed = pako.gzip(bitstring);
 
-    // Encode as base64url
     const encodedList = Buffer.from(compressed)
       .toString('base64')
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '');
 
+    const parts = listId.split('-');
+    const category = parts[1] || 'general';
+    const year = parts[2] || new Date().getFullYear().toString();
+    const domain = process.env.PUBLIC_DOMAIN || 'localhost';
+    const publicUrl = `https://${domain}/status/${category}/${year}/status-list.json`;
+
     const result = await client.query(
-      `INSERT INTO status_lists (id, next_index, encoded_list, size, status_purpose)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO status_lists (id, next_index, encoded_list, size, status_purpose, public_url)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [listId, 0, encodedList, size, statusPurpose]
+      [listId, 0, encodedList, size, statusPurpose, publicUrl]
     );
 
     await client.query('COMMIT');
@@ -115,11 +119,13 @@ export async function allocateStatusIndices(
 
     const allocations: StatusAllocation[] = [];
     for (let i = startIndex; i < endIndex; i++) {
-      await client.query(
+      console.log(`📝 Inserting audit log: listId=${listId}, index=${i}, action=allocate`);
+      const auditResult = await client.query(
         `INSERT INTO audit_logs (list_id, credential_index, credential_id, action)
-         VALUES ($1, $2, $3, $4)`,
+         VALUES ($1, $2, $3, $4) RETURNING *`,
         [listId, i, credentialId || null, 'allocate']
       );
+      console.log(`✅ Audit log inserted:`, auditResult.rows[0]);
       
       allocations.push({
         index: i,
@@ -132,7 +138,9 @@ export async function allocateStatusIndices(
       });
     }
 
+    console.log(`💾 Committing transaction for allocateStatusIndices`);
     await client.query('COMMIT');
+    console.log(`✅ Transaction committed successfully`);
     return allocations;
   } catch (error) {
     await client.query('ROLLBACK');
@@ -185,7 +193,6 @@ export async function setStatusBit(
       bitstring[byteIndex] &= ~(1 << bitIndex);
     }
 
-    // Compress and encode back
     const newCompressed = pako.gzip(bitstring);
     const newEncodedList = Buffer.from(newCompressed)
       .toString('base64')
@@ -193,21 +200,25 @@ export async function setStatusBit(
       .replace(/\//g, '_')
       .replace(/=/g, '');
 
-    // Update status list
-    await client.query(
-      `UPDATE status_lists SET encoded_list = $1 WHERE id = $2`,
+    console.log(`📝 Updating status list: listId=${listId}, new encodedList length=${newEncodedList.length}`);
+    const updateResult = await client.query(
+      `UPDATE status_lists SET encoded_list = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING updated_at`,
       [newEncodedList, listId]
     );
+    console.log(`✅ Status list updated, new updated_at:`, updateResult.rows[0]?.updated_at);
 
-    // Log the action
     const action = value === 1 ? 'revoke' : 'unrevoke';
-    await client.query(
+    console.log(`📝 Inserting audit log: listId=${listId}, index=${index}, action=${action}`);
+    const auditResult = await client.query(
       `INSERT INTO audit_logs (list_id, credential_index, credential_id, action, metadata)
-       VALUES ($1, $2, $3, $4, $5)`,
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [listId, index, credentialId || null, action, metadata ? JSON.stringify(metadata) : null]
     );
+    console.log(`✅ Audit log inserted:`, auditResult.rows[0]);
 
+    console.log(`💾 Committing transaction for setStatusBit`);
     await client.query('COMMIT');
+    console.log(`✅ Transaction committed successfully`);
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
@@ -232,9 +243,19 @@ export async function getStatusList(listId: string): Promise<StatusList | null> 
   return dbRowToStatusList(result.rows[0]);
 }
 
-/**
- * Get audit logs for a status list
- */
+export async function getStatusListByPublicUrl(publicUrl: string): Promise<StatusList | null> {
+  const result = await pool.query(
+    `SELECT * FROM status_lists WHERE public_url = $1`,
+    [publicUrl]
+  );
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  return dbRowToStatusList(result.rows[0]);
+}
+
 export async function getAuditLogs(
   listId: string,
   limit: number = 100,
@@ -261,6 +282,7 @@ function dbRowToStatusList(row: any): StatusList {
     encodedList: row.encoded_list,
     size: row.size,
     statusPurpose: row.status_purpose,
+    publicUrl: row.public_url,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

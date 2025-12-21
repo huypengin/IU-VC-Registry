@@ -38,6 +38,8 @@ export async function publishStatusList(listId: string): Promise<void> {
     keyPairJson,
     documentLoader
   });
+  
+  console.log('result sign', signed);
 
   await fs.writeFile(filePath, JSON.stringify(signed, null, 2), 'utf8');
   console.log(`✅ Published SIGNED status list: ${listId} -> ${filePath}`);
@@ -60,7 +62,8 @@ function buildUnsignedStatusList2021Credential({
   return {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
-      "https://w3id.org/vc/status-list/2021/v1"
+      "https://w3id.org/vc/status-list/2021/v1",
+        'https://w3id.org/security/data-integrity/v2'
     ],
     id: statusListUrl,
     type: ["VerifiableCredential", "StatusList2021Credential"],

@@ -8,6 +8,7 @@ import {
   allocateStatusIndices,
   setStatusBit,
   getStatusList,
+  getStatusListByPublicUrl,
   getAuditLogs,
 } from "./status/status-list-service.js";
 import { publishStatusList } from "./status/status-list-publisher.js";
@@ -89,6 +90,48 @@ app.post("/admin/status-lists/:listId/allocate", async (req, res) => {
   }
 });
 
+app.post("/admin/status/revoke", async (req, res) => {
+  try {
+    const { statusListCredential, statusListIndex, credentialId, reason } = req.body ?? {};
+    
+    if (!statusListCredential || typeof statusListIndex !== 'string') {
+      res.status(400).json({ 
+        error: "statusListCredential and statusListIndex are required" 
+      });
+      return;
+    }
+
+    const list = await getStatusListByPublicUrl(statusListCredential);
+    
+    if (!list) {
+      res.status(404).json({ 
+        error: `Status list not found for URL: ${statusListCredential}` 
+      });
+      return;
+    }
+
+    const index = parseInt(statusListIndex, 10);
+    
+    if (isNaN(index) || index < 0) {
+      res.status(400).json({ error: "statusListIndex must be a valid non-negative number" });
+      return;
+    }
+
+    await setStatusBit(list.id, index, 1, credentialId, { reason });
+    await publishStatusList(list.id);
+    
+    res.json({
+      ok: true,
+      listId: list.id,
+      index,
+      action: 'revoked',
+    });
+  } catch (error: any) {
+    console.error('Error revoking credential:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post("/admin/status-lists/:listId/revoke", async (req, res) => {
   try {
     const { listId } = req.params;
@@ -132,6 +175,48 @@ app.post("/admin/status-lists/:listId/unrevoke", async (req, res) => {
     res.json({
       ok: true,
       listId,
+      index,
+      action: 'unrevoked',
+    });
+  } catch (error: any) {
+    console.error('Error unrevoking credential:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/admin/status/unrevoke", async (req, res) => {
+  try {
+    const { statusListCredential, statusListIndex, credentialId, reason } = req.body ?? {};
+    
+    if (!statusListCredential || typeof statusListIndex !== 'string') {
+      res.status(400).json({ 
+        error: "statusListCredential and statusListIndex are required" 
+      });
+      return;
+    }
+
+    const list = await getStatusListByPublicUrl(statusListCredential);
+    
+    if (!list) {
+      res.status(404).json({ 
+        error: `Status list not found for URL: ${statusListCredential}` 
+      });
+      return;
+    }
+
+    const index = parseInt(statusListIndex, 10);
+    
+    if (isNaN(index) || index < 0) {
+      res.status(400).json({ error: "statusListIndex must be a valid non-negative number" });
+      return;
+    }
+
+    await setStatusBit(list.id, index, 0, credentialId, { reason });
+    await publishStatusList(list.id);
+    
+    res.json({
+      ok: true,
+      listId: list.id,
       index,
       action: 'unrevoked',
     });
