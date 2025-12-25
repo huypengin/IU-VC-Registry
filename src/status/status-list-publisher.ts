@@ -10,15 +10,21 @@ interface StatusList2021CredentialParams {
   listId: string;
   encodedList: string;
   statusPurpose: string;
+  publicUrl: string;
 }
 
 export async function publishStatusList(listId: string): Promise<void> {
   const statusList = await getStatusList(listId);
   if (!statusList) throw new Error(`Status list not found: ${listId}`);
 
-  const parts = listId.split('-');
-  const category = parts[1] || 'general';
-  const year = parts[2] || new Date().getFullYear().toString();
+  if (!statusList.publicUrl) {
+    throw new Error(`Status list ${listId} has no public_url configured`);
+  }
+
+  const urlPath = new URL(statusList.publicUrl).pathname;
+  const pathParts = urlPath.split('/').filter(p => p);
+  const category = pathParts[1] || 'general';
+  const year = pathParts[2] || new Date().getFullYear().toString();
 
   const dirPath = path.join(PUBLIC_REGISTRY_PATH, category, year);
   const filePath = path.join(dirPath, 'status-list.json');
@@ -27,7 +33,8 @@ export async function publishStatusList(listId: string): Promise<void> {
   const unsigned = buildUnsignedStatusList2021Credential({
     listId,
     encodedList: statusList.encodedList,
-    statusPurpose: statusList.statusPurpose
+    statusPurpose: statusList.statusPurpose,
+    publicUrl: statusList.publicUrl
   });
 
   const keyPairJson = loadMultikeyFromEnv();
@@ -38,7 +45,7 @@ export async function publishStatusList(listId: string): Promise<void> {
     keyPairJson,
     documentLoader
   });
-  
+
   console.log('result sign', signed);
 
   await fs.writeFile(filePath, JSON.stringify(signed, null, 2), 'utf8');
@@ -48,16 +55,11 @@ export async function publishStatusList(listId: string): Promise<void> {
 function buildUnsignedStatusList2021Credential({
   listId,
   encodedList,
-  statusPurpose
+  statusPurpose,
+  publicUrl
 }: StatusList2021CredentialParams): any {
   const now = new Date().toISOString();
   const config = getIssuerConfig();
-
-  const parts = listId.split('-');
-  const category = parts[1] || 'general';
-  const year = parts[2] || new Date().getFullYear().toString();
-
-  const statusListUrl = `https://${config.publicDomain}/status/${category}/${year}/status-list.json`;
 
   return {
     "@context": [
@@ -65,12 +67,12 @@ function buildUnsignedStatusList2021Credential({
       "https://w3id.org/vc/status-list/2021/v1",
         'https://w3id.org/security/data-integrity/v2'
     ],
-    id: statusListUrl,
+    id: publicUrl,
     type: ["VerifiableCredential", "StatusList2021Credential"],
     issuer: config.issuerDid,
     issuanceDate: now,
     credentialSubject: {
-      id: `${statusListUrl}#list`,
+      id: `${publicUrl}#list`,
       type: "StatusList2021",
       statusPurpose,
       encodedList

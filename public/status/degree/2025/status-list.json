@@ -1,0 +1,19 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://helena-unda-bounceably.ngrok-free.dev/contexts/vn-edu-statuslist-v1.jsonld"
+  ],
+  "id": "https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025",
+  "type": [
+    "VerifiableCredential",
+    "StatusList2021Credential"
+  ],
+  "issuer": "did:web:helena-unda-bounceably.ngrok-free.dev",
+  "validFrom": "2025-01-01T00:00:00Z",
+  "credentialSubject": {
+    "id": "https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025#list",
+    "type": "StatusList2021",
+    "statusPurpose": "revocation",
+    "encodedList": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+  }
+}

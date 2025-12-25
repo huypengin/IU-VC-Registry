@@ -1,6 +1,20 @@
 import { pool } from '../db/connection.js';
 import { pako } from './pako-wrapper.js';
 
+function extractCategoryAndYear(listId: string): { category: string; year: string } {
+  const slashParts = listId.split('/');
+  if (slashParts.length >= 2) {
+    const category = slashParts[0];
+    const yearPart = slashParts[1].split('-')[0];
+    return { category, year: yearPart };
+  }
+  
+  const dashParts = listId.split('-');
+  const category = dashParts.length > 1 ? dashParts[1] : 'general';
+  const year = dashParts.length > 2 ? dashParts[2] : new Date().getFullYear().toString();
+  return { category, year };
+}
+
 export interface StatusList {
   id: string;
   nextIndex: number;
@@ -55,9 +69,7 @@ export async function initStatusList(
       .replace(/\//g, '_')
       .replace(/=/g, '');
 
-    const parts = listId.split('-');
-    const category = parts[1] || 'general';
-    const year = parts[2] || new Date().getFullYear().toString();
+    const { category, year } = extractCategoryAndYear(listId);
     const domain = process.env.PUBLIC_DOMAIN || 'localhost';
     const publicUrl = `https://${domain}/status/${category}/${year}/status-list.json`;
 
@@ -112,9 +124,7 @@ export async function allocateStatusIndices(
     );
 
     const domain = process.env.PUBLIC_DOMAIN || 'helena-unda-bounceably.ngrok-free.dev';
-    const parts = listId.split('-');
-    const category = parts[1] || 'general';
-    const year = parts[2] || new Date().getFullYear().toString();
+    const { category, year } = extractCategoryAndYear(listId);
     const statusListUrl = `https://${domain}/status/${category}/${year}/status-list.json`;
 
     const allocations: StatusAllocation[] = [];

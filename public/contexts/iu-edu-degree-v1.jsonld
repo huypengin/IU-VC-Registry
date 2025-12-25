@@ -1,0 +1,46 @@
+{
+  "@context": {
+    "@version": 1.0,
+
+    "id": "@id",
+    "type": "@type",
+
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "vnEdu": "https://vc-registry.test/vocab/vn-edu#",
+
+    "DegreeCredential": "vnEdu:DegreeCredential",
+
+    "degreeName": "vnEdu:degreeName",
+    "degreeType": "vnEdu:degreeType",
+    "degreeLevel": "vnEdu:degreeLevel",
+    "programName": "vnEdu:programName",
+    "programCode": "vnEdu:programCode",
+
+    "major": "vnEdu:major",
+    "minor": "vnEdu:minor",
+    "honours": "vnEdu:honours",
+
+    "gpa": {
+      "@id": "vnEdu:gpa",
+      "@type": "xsd:decimal"
+    },
+    "gradingScale": "vnEdu:gradingScale",
+
+    "studyMode": "vnEdu:studyMode",
+    "academicPeriod": "vnEdu:academicPeriod",
+
+    "enrolmentStartDate": {
+      "@id": "vnEdu:enrolmentStartDate",
+      "@type": "xsd:date"
+    },
+    "enrolmentEndDate": {
+      "@id": "vnEdu:enrolmentEndDate",
+      "@type": "xsd:date"
+    },
+    "graduationDate": {
+      "@id": "vnEdu:graduationDate",
+      "@type": "xsd:date"
+    }
+  }
+}

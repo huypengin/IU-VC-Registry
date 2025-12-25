@@ -1,0 +1,265 @@
+{
+  "$id": "https://vc.example.vn/schemas/iu-edu-degree-v1.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IU Education Degree Verifiable Credential v1",
+  "type": "object",
+  "additionalProperties": true,
+
+  "properties": {
+    "@context": {
+      "description": "VC contexts including W3C VC v2 and IU custom contexts.",
+      "type": "array",
+      "items": {
+        "type": ["string", "object"]
+      },
+      "minItems": 1
+    },
+
+    "id": {
+      "description": "Optional VC identifier.",
+      "type": "string",
+      "format": "uri"
+    },
+
+    "type": {
+      "description": "VC types, must include VerifiableCredential and IU degree type.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+
+    "issuer": {
+      "description": "Issuer of the credential. For did:web: typically an object with id.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uri"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": true
+        }
+      ]
+    },
+
+    "issuanceDate": {
+      "description": "Date/time when the credential becomes valid.",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "validFrom": {
+      "description": "Alternative validity start (VC 2.0).",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "validUntil": {
+      "description": "Optional validity end.",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "name": {
+      "description": "Human-readable name of the credential.",
+      "type": "string"
+    },
+
+    "description": {
+      "description": "Short description of the credential purpose.",
+      "type": "string"
+    },
+
+    "credentialSchema": {
+      "description": "Self-reference to this JSON Schema.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "type"],
+      "additionalProperties": true
+    },
+
+    "credentialStatus": {
+      "description": "Status object (e.g. StatusList2021).",
+      "type": "object"
+    },
+
+    "credentialSubject": {
+      "description": "IU degree-specific subject data.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "description": "Subject identifier, often a DID.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Subject type, e.g. Student.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+
+        "studentId": {
+          "description": "Internal IU student identifier.",
+          "type": "string"
+        },
+        "fullName": {
+          "description": "Full legal name of the student.",
+          "type": "string"
+        },
+        "givenName": {
+          "description": "Given name(s).",
+          "type": "string"
+        },
+        "familyName": {
+          "description": "Family name.",
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "description": "Date of birth (YYYY-MM-DD).",
+          "type": "string",
+          "format": "date"
+        },
+        "nationalId": {
+          "description": "National ID / citizen number.",
+          "type": "string"
+        },
+        "email": {
+          "description": "Student email.",
+          "type": "string",
+          "format": "email"
+        },
+
+        "institution": {
+          "description": "Reference to the issuing institution (DID/URL).",
+          "type": "string"
+        },
+        "institutionName": {
+          "description": "Human-readable institution name.",
+          "type": "string"
+        },
+        "institutionId": {
+          "description": "Internal institution code/id.",
+          "type": "string"
+        },
+
+        "degreeName": {
+          "description": "Formal name of the degree (e.g. Bachelor of Computer Science).",
+          "type": "string"
+        },
+        "degreeType": {
+          "description": "Degree type (e.g. Bachelor, Master).",
+          "type": "string"
+        },
+        "degreeLevel": {
+          "description": "Level classification (e.g. ISCED level).",
+          "type": "string"
+        },
+        "programName": {
+          "description": "Study program name.",
+          "type": "string"
+        },
+        "programCode": {
+          "description": "Study program code used by IU.",
+          "type": "string"
+        },
+        "major": {
+          "description": "Major field of study.",
+          "type": "string"
+        },
+        "minor": {
+          "description": "Minor / secondary field.",
+          "type": "string"
+        },
+        "honours": {
+          "description": "Honours classification (e.g. Distinction, Merit).",
+          "type": "string"
+        },
+
+        "gpa": {
+          "description": "Final GPA value.",
+          "type": "number"
+        },
+        "gradingScale": {
+          "description": "Description or code for grading scale (e.g. 4.0, 10, 100).",
+          "type": "string"
+        },
+
+        "studyMode": {
+          "description": "Mode of study (full-time, part-time, etc.).",
+          "type": "string"
+        },
+        "academicPeriod": {
+          "description": "Text description of overall academic period.",
+          "type": "string"
+        },
+        "enrolmentStartDate": {
+          "description": "Start date of the degree program.",
+          "type": "string",
+          "format": "date"
+        },
+        "enrolmentEndDate": {
+          "description": "End date of the degree program.",
+          "type": "string",
+          "format": "date"
+        },
+        "graduationDate": {
+          "description": "Official graduation date.",
+          "type": "string",
+          "format": "date"
+        },
+
+        "language": {
+          "description": "Language used in the credential (e.g. vi, en).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "studentId",
+        "fullName",
+        "degreeName",
+        "programName",
+        "graduationDate"
+      ]
+    },
+
+    "proof": {
+      "description": "Proof object (JSON-LD Data Integrity / JOSE / COSE).",
+      "type": "object"
+    }
+  },
+
+  "required": ["@context", "type", "issuer", "credentialSubject", "validFrom"]
+}

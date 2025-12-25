@@ -30,6 +30,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:revoke-api": "powershell -ExecutionPolicy Bypass -File ./scripts/test-revoke-by-credential-status.ps1",
+    "test:ngrok": "powershell -ExecutionPolicy Bypass -File ./scripts/test-ngrok-workflow.ps1",
     "generate:issuer": "npm run build && node ./dist/src/registry/issuers/helper/keyGenerator.js generate",
     "generate:issuer:dev": "node --loader ts-node/esm ./src/registry/issuers/helper/keyGenerator.ts generate",
     "generate:multikey:env": "node --loader ts-node/esm tools/generate-multikey-env.ts",
