@@ -14,6 +14,13 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, "..");
 const SRC = path.join(ROOT, "src", "registry");
 const PUBLIC = path.join(ROOT, "public");
+const REGISTRY_CONFIG_PATH = path.join(SRC, "registry.config.json");
+const DEFAULT_BASE_URL = "https://helena-unda-bounceably.ngrok-free.dev";
+const REGISTRY_BASE_URL_ENV = "REGISTRY_BASE_URL";
+
+type RegistryConfig = {
+    baseUrl?: string;
+};
 
 /**
  * Recursively walk directory and run callback on each file.
@@ -49,7 +56,11 @@ function validateJsonSyntax(filePath: string) {
 /**
  * Copy directory recursively.
  */
-function copyDir(src: string, dest: string) {
+function copyDir(
+    src: string,
+    dest: string,
+    transform?: (filePath: string, content: string) => string
+) {
     if (!fs.existsSync(src)) return;
     if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
 
@@ -59,11 +70,67 @@ function copyDir(src: string, dest: string) {
         const stat = fs.statSync(srcPath);
 
         if (stat.isDirectory()) {
-            copyDir(srcPath, destPath);
+            copyDir(srcPath, destPath, transform);
         } else {
-            fs.copyFileSync(srcPath, destPath);
+            if (transform && shouldRewriteFile(srcPath)) {
+                const raw = fs.readFileSync(srcPath, "utf8");
+                const rewritten = transform(srcPath, raw);
+                fs.writeFileSync(destPath, rewritten, "utf8");
+            } else {
+                fs.copyFileSync(srcPath, destPath);
+            }
         }
     }
+}
+
+function normalizeBaseUrl(value?: string): string | undefined {
+    const trimmed = value?.trim();
+    if (!trimmed) return undefined;
+    const withoutSlash = trimmed.replace(/\/+$/, "");
+    if (withoutSlash.startsWith("http://") || withoutSlash.startsWith("https://")) {
+        return withoutSlash;
+    }
+    return `https://${withoutSlash}`;
+}
+
+function loadRegistryConfig(): RegistryConfig {
+    const envBaseUrl = normalizeBaseUrl(process.env[REGISTRY_BASE_URL_ENV]);
+    if (envBaseUrl) {
+        return { baseUrl: envBaseUrl };
+    }
+    if (!fs.existsSync(REGISTRY_CONFIG_PATH)) {
+        return { baseUrl: DEFAULT_BASE_URL };
+    }
+    try {
+        const raw = fs.readFileSync(REGISTRY_CONFIG_PATH, "utf8");
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed.baseUrl === "string" && parsed.baseUrl.trim()) {
+            return { baseUrl: normalizeBaseUrl(parsed.baseUrl) };
+        }
+        return { baseUrl: DEFAULT_BASE_URL };
+    } catch (e) {
+        console.warn(`⚠️ Failed to read registry config (${REGISTRY_CONFIG_PATH}), using default baseUrl.`);
+        return { baseUrl: DEFAULT_BASE_URL };
+    }
+}
+
+function shouldRewriteFile(filePath: string): boolean {
+    const ext = path.extname(filePath);
+    if (![".json", ".jsonld"].includes(ext)) return false;
+    const rel = path.relative(SRC, filePath).split(path.sep).join("/");
+    return (
+        rel.startsWith("contexts/") ||
+        rel.startsWith("credentialSchema/") ||
+        rel.startsWith("status/")
+    );
+}
+
+function createBaseUrlRewriter(baseUrl: string | undefined) {
+    if (!baseUrl || baseUrl === DEFAULT_BASE_URL) {
+        return (_filePath: string, content: string) => content;
+    }
+    return (_filePath: string, content: string) =>
+        content.replaceAll(DEFAULT_BASE_URL, baseUrl);
 }
 
 /**
@@ -164,8 +231,14 @@ program
             fs.rmSync(PUBLIC, { recursive: true, force: true });
         }
 
+        const { baseUrl } = loadRegistryConfig();
+        const rewrite = createBaseUrlRewriter(baseUrl ?? DEFAULT_BASE_URL);
+
         console.log(`📦 Copying ${SRC} → ${PUBLIC}`);
-        copyDir(SRC, PUBLIC);
+        if (baseUrl && baseUrl !== DEFAULT_BASE_URL) {
+            console.log(`🔁 Rewriting baseUrl ${DEFAULT_BASE_URL} → ${baseUrl}`);
+        }
+        copyDir(SRC, PUBLIC, rewrite);
 
         console.log("✅ Build complete. public/ is ready for Docker/nginx.");
     });
@@ -207,7 +280,12 @@ program
         if (fs.existsSync(PUBLIC)) {
           fs.rmSync(PUBLIC, { recursive: true, force: true });
         }
-        copyDir(SRC, PUBLIC);
+        const { baseUrl } = loadRegistryConfig();
+        const rewrite = createBaseUrlRewriter(baseUrl ?? DEFAULT_BASE_URL);
+        if (baseUrl && baseUrl !== DEFAULT_BASE_URL) {
+          console.log(`🔁 Rewriting baseUrl ${DEFAULT_BASE_URL} → ${baseUrl}`);
+        }
+        copyDir(SRC, PUBLIC, rewrite);
         console.log('✅ public/ updated with generated assets.');
       } catch (e) {
         console.error('Failed to build public/ after generation:', e);

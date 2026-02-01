@@ -1,0 +1,208 @@
+{
+  "$id": "https://helena-unda-bounceably.ngrok-free.dev/credentialSchema/iu-smartcert-v1.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IU SmartCert Verifiable Credential v1",
+  "type": "object",
+  "additionalProperties": true,
+
+  "properties": {
+    "@context": {
+      "description": "VC contexts including W3C VC v2 and IU custom contexts.",
+      "type": "array",
+      "items": {
+        "type": ["string", "object"]
+      },
+      "minItems": 1
+    },
+
+    "id": {
+      "description": "Optional VC identifier.",
+      "type": "string",
+      "format": "uri"
+    },
+
+    "type": {
+      "description": "VC types, must include VerifiableCredential and IU SmartCert types.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+
+    "issuer": {
+      "description": "Issuer of the credential.",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uri"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "additionalProperties": true
+        }
+      ]
+    },
+
+    "issuanceDate": {
+      "description": "Date/time when the credential becomes valid (VC 1.1).",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "validFrom": {
+      "description": "Validity start (VC 2.0).",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "validUntil": {
+      "description": "Optional validity end.",
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "credentialSchema": {
+      "description": "Self-reference to this JSON Schema.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "type"],
+      "additionalProperties": true
+    },
+
+    "credentialStatus": {
+      "description": "StatusList2021Entry for revocation status.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uri" },
+        "type": { "type": "string", "enum": ["StatusList2021Entry"] },
+        "statusPurpose": { "type": "string", "enum": ["revocation"] },
+        "statusListIndex": { "type": "string", "pattern": "^[0-9]+$" },
+        "statusListCredential": { "type": "string", "format": "uri" }
+      },
+      "required": [
+        "id",
+        "type",
+        "statusPurpose",
+        "statusListIndex",
+        "statusListCredential"
+      ]
+    },
+
+    "credentialSubject": {
+      "description": "IU SmartCert subject data.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "description": "Subject identifier, often a DID.",
+          "type": "string"
+        },
+        "degree": {
+          "description": "Degree summary.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "type": { "type": "string" },
+            "name": { "type": "string" }
+          },
+          "required": ["type", "name"]
+        },
+        "iu:components": {
+          "description": "Component manifests anchored in Merkle tree.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "name": { "type": "string" },
+              "mandatory": { "type": "boolean" },
+              "componentType": { "type": "string" },
+              "componentHash": { "type": "string" }
+            },
+            "required": ["name", "mandatory", "componentType", "componentHash"]
+          }
+        }
+      },
+      "required": ["id", "degree", "iu:components"]
+    },
+
+    "iu:merkleReceipt": {
+      "description": "IU SmartCert Merkle receipt.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string" },
+        "chainId": { "type": "string" },
+        "contractAddress": { "type": "string" },
+        "merkleRoot": { "type": "string" },
+        "anchorTx": { "type": "string" },
+        "hashAlg": { "type": "string" },
+        "leafEncoding": { "type": "string" }
+      },
+      "required": [
+        "type",
+        "chainId",
+        "contractAddress",
+        "merkleRoot",
+        "anchorTx",
+        "hashAlg",
+        "leafEncoding"
+      ]
+    },
+
+    "evidence": {
+      "description": "Optional evidence artifacts.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string", "format": "uri" },
+          "type": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            ]
+          },
+          "digestMultibase": { "type": "string" },
+          "iu:purpose": { "type": "string" }
+        },
+        "required": ["id", "type"]
+      }
+    },
+
+    "proof": {
+      "description": "Proof object (JSON-LD Data Integrity / JOSE / COSE).",
+      "type": "object"
+    }
+  },
+
+  "required": ["@context", "type", "issuer", "credentialSubject", "validFrom", "credentialSchema"]
+}

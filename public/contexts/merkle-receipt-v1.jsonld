@@ -1,0 +1,22 @@
+{
+  "@context": {
+    "@version": 1.0,
+
+    "id": "@id",
+    "type": "@type",
+
+    "iu": "https://helena-unda-bounceably.ngrok-free.dev/vocab/iu#",
+
+    "IUSmartCertMerkleReceipt": "iu:IUSmartCertMerkleReceipt",
+
+    "chainId": "iu:chainId",
+    "contractAddress": "iu:contractAddress",
+    "merkleRoot": "iu:merkleRoot",
+    "anchorTx": "iu:anchorTx",
+    "hashAlg": "iu:hashAlg",
+    "leafEncoding": "iu:leafEncoding",
+
+    "digestMultibase": "iu:digestMultibase",
+    "purpose": "iu:purpose"
+  }
+}

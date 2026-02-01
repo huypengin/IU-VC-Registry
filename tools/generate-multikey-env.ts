@@ -32,6 +32,7 @@ try {
 
     console.log('\n=== Environment Variables ===\n');
     console.log(`PUBLIC_DOMAIN=helena-unda-bounceably.ngrok-free.dev`);
+    console.log(`REGISTRY_BASE_URL=https://helena-unda-bounceably.ngrok-free.dev`);
     console.log(`ISSUER_DID=${controllerId}`);
     console.log(`ISSUER_VERIFICATION_METHOD=${keyId}`);
     console.log(`ED25519_MULTIKEY_JSON='${JSON.stringify(multikeyJson)}'`);
@@ -41,4 +42,3 @@ try {
     console.error('Error generating Multikey:', error);
     process.exit(1);
 }
-

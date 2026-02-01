@@ -20,14 +20,20 @@ app.use(helmet({
   contentSecurityPolicy: false,
 }));
 
-const PUBLIC_DIR = path.resolve('public');
+// Static registry assets are built into `public/` (via `npm run registry:build`).
+// In some setups (e.g. Docker), dynamic status files may be written into `public/status`
+// while the rest of the registry is served from another directory (e.g. mounted static build).
+const DYNAMIC_PUBLIC_DIR = path.resolve("public");
+const STATIC_PUBLIC_DIR = process.env.REGISTRY_STATIC_DIR
+  ? path.resolve(process.env.REGISTRY_STATIC_DIR)
+  : DYNAMIC_PUBLIC_DIR;
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
-app.use(express.static(PUBLIC_DIR, {
+app.use(express.static(DYNAMIC_PUBLIC_DIR, {
   setHeaders: (res, filepath) => {
     if (filepath.includes('/status/')) {
       res.setHeader('Cache-Control', 'public, max-age=300, must-revalidate');
@@ -37,6 +43,19 @@ app.use(express.static(PUBLIC_DIR, {
     res.setHeader('X-Content-Type-Options', 'nosniff');
   },
 }));
+
+if (STATIC_PUBLIC_DIR !== DYNAMIC_PUBLIC_DIR) {
+  app.use(express.static(STATIC_PUBLIC_DIR, {
+    setHeaders: (res, filepath) => {
+      if (filepath.includes("/status/")) {
+        res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
+      } else if (filepath.endsWith(".json") || filepath.endsWith(".jsonld")) {
+        res.setHeader("Cache-Control", "public, max-age=3600, immutable");
+      }
+      res.setHeader("X-Content-Type-Options", "nosniff");
+    },
+  }));
+}
 
 app.post("/admin/status-lists/init", async (req, res) => {
   try {
@@ -281,7 +300,7 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log(`✅ Registry server listening on port ${port}`);
   console.log(`📊 Health check: http://localhost:${port}/health`);
-  console.log(`📁 Serving static files from: ${PUBLIC_DIR}`);
+  console.log(`📁 Serving dynamic files from: ${DYNAMIC_PUBLIC_DIR}`);
+  console.log(`📁 Serving static files from: ${STATIC_PUBLIC_DIR}`);
   console.log(`🔧 Admin API: http://localhost:${port}/admin/...`);
 });
-

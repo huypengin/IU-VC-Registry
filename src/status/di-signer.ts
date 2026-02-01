@@ -24,12 +24,20 @@ function readJson(relPathFromProjectRoot: string) {
     return JSON.parse(fs.readFileSync(abs, 'utf8'));
 }
 
+function getRegistryStaticRoot(): string {
+    // Use the same env var as registry-server so local dev can point to `src/registry`
+    // while production/default keeps using `public/`.
+    const env = process.env.REGISTRY_STATIC_DIR?.trim();
+    return env ? path.resolve(env) : path.resolve('public');
+}
+
 // Pin full context documents locally (NOT partial contexts)
+const CONTEXTS_DIR = path.join(getRegistryStaticRoot(), 'contexts');
 const LOCAL_CONTEXTS: Record<string, any> = {
-    'https://www.w3.org/2018/credentials/v1': readJson('public/contexts/vc-v1.json'),
-    'https://w3id.org/vc/status-list/2021/v1': readJson('public/contexts/status-list-2021-v1.json'),
-    'https://w3id.org/security/data-integrity/v2': readJson('public/contexts/data-integrity-v2.json'),
-    'https://w3id.org/security/multikey/v1': readJson('public/contexts/multikey-v1.json'),
+    'https://www.w3.org/2018/credentials/v1': readJson(path.join(CONTEXTS_DIR, 'vc-v1.json')),
+    'https://w3id.org/vc/status-list/2021/v1': readJson(path.join(CONTEXTS_DIR, 'status-list-2021-v1.json')),
+    'https://w3id.org/security/data-integrity/v2': readJson(path.join(CONTEXTS_DIR, 'data-integrity-v2.json')),
+    'https://w3id.org/security/multikey/v1': readJson(path.join(CONTEXTS_DIR, 'multikey-v1.json')),
 };
 
 export function makeDocumentLoader(extraDocuments: Record<string, any> = {}) {

@@ -18,9 +18,10 @@ RUN tsc
 
 # Create directories for dynamic files
 RUN mkdir -p /app/public/status
+# Also include JSON-LD context documents used for signing (loaded from /app/public/contexts by default).
+RUN mkdir -p /app/public/contexts && cp -R /app/src/registry/contexts/* /app/public/contexts/
 
 EXPOSE 3000
 
 # Run the registry server (serves API + writes status files)
 CMD ["node", "dist/src/registry-server.js"]
-

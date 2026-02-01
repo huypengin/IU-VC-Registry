@@ -7,6 +7,9 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
+ARG REGISTRY_BASE_URL
+ENV REGISTRY_BASE_URL=${REGISTRY_BASE_URL}
+
 COPY package.json package-lock.json* yarn.lock* ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 

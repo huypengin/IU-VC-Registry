@@ -57,6 +57,8 @@ services:
     build:
       context: ..
       dockerfile: infra/Dockerfile.nginx
+      args:
+        REGISTRY_BASE_URL: https://helena-unda-bounceably.ngrok-free.dev
     container_name: iu-did-web-static
     volumes:
       - status-files:/usr/share/nginx/html/status:ro  # Dynamic status files (READ-ONLY)
@@ -85,4 +87,3 @@ volumes:
     driver: local
   static-files:
     driver: local
-
