@@ -35,6 +35,7 @@ try {
     console.log(`REGISTRY_BASE_URL=https://helena-unda-bounceably.ngrok-free.dev`);
     console.log(`ISSUER_DID=${controllerId}`);
     console.log(`ISSUER_VERIFICATION_METHOD=${keyId}`);
+    console.log(`ISSUER_ED25519_PRIVATE_KEY=${keyData.privateKey}`);
     console.log(`ED25519_MULTIKEY_JSON='${JSON.stringify(multikeyJson)}'`);
     console.log('\n=== Copy the above to your .env file ===\n');
 

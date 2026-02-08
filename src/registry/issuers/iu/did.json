@@ -2,16 +2,16 @@
   "@context": [
     "https://www.w3.org/ns/did/v1"
   ],
-  "id": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu",
+  "id": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:principle",
   "verificationMethod": [
     {
-      "id": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu:z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS",
+      "id": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:principle:z6MknN7BwK9kVwGEgL7SVbRLw2V3KdzDfRPnvGPksLZxud7W",
       "type": "Ed25519VerificationKey2020",
-      "controller": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu",
-      "publicKeyMultibase": "z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS"
+      "controller": "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:principle",
+      "publicKeyMultibase": "z6MknN7BwK9kVwGEgL7SVbRLw2V3KdzDfRPnvGPksLZxud7W"
     }
   ],
   "assertionMethod": [
-    "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu:z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS"
+    "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:principle:z6MknN7BwK9kVwGEgL7SVbRLw2V3KdzDfRPnvGPksLZxud7W"
   ]
 }
