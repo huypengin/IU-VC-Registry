@@ -1,58 +1,6 @@
 
 services:
-  # PostgreSQL database for status lists
-  postgres:
-    image: postgres:16-alpine
-    container_name: iu-did-postgres
-    environment:
-      POSTGRES_USER: iu_did_user
-      POSTGRES_PASSWORD: iu_did_password
-      POSTGRES_DB: iu_did_db
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - vc-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U iu_did_user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Node.js API service (writes dynamic status files)
-  registry-api:
-    build:
-      context: ..
-      dockerfile: infra/Dockerfile.api
-    container_name: iu-did-api
-    environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DATABASE_URL=postgres://iu_did_user:iu_did_password@postgres:5432/iu_did_db
-      - PUBLIC_DOMAIN=helena-unda-bounceably.ngrok-free.dev
-      - ISSUER_DID=did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu
-      - ISSUER_VERIFICATION_METHOD=did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu#z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS
-      - ED25519_MULTIKEY_JSON={"@context":"https://w3id.org/security/multikey/v1","type":"Multikey","controller":"did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu","id":"did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu#z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS","publicKeyMultibase":"z6Mki3AE8H79bMRsYXzLwkYSrowa9Xb1LfnSGvLhm4kigmrS","secretKeyMultibase":"zrv3NaV8kNDoTwyXDVHSJmoPKh2vdZ87bs1vLTfo2oUvzWJeJCfit7gn4f4X13guw79speHikghjLQmjPpUstfuGAQS"}
-    volumes:
-      - status-files:/app/public/status      # Dynamic status files (WRITE)
-      - static-files:/app/public-static:ro   # Static files from nginx build (READ)
-    ports:
-      - "3000:3000"
-    networks:
-      - vc-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Nginx web server (serves static + dynamic files)
+  # Nginx web server (serves static files only)
   vc-registry-web:
     build:
       context: ..
@@ -60,30 +8,11 @@ services:
       args:
         REGISTRY_BASE_URL: https://helena-unda-bounceably.ngrok-free.dev
     container_name: iu-did-web-static
-    volumes:
-      - status-files:/usr/share/nginx/html/status:ro  # Dynamic status files (READ-ONLY)
-      - static-files:/tmp/static-build                 # Temporary for extracting static files
     ports:
       - "8080:80"
-    networks:
-      - vc-network
-    depends_on:
-      - registry-api
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-networks:
-  vc-network:
-    driver: bridge
-
-volumes:
-  postgres-data:
-    driver: local
-  status-files:
-    driver: local
-  static-files:
-    driver: local
