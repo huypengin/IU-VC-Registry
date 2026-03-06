@@ -2,6 +2,10 @@ steps:
   - name: gcr.io/cloud-builders/docker
     args:
       - build
+      - -f
+      - infra/Dockerfile.nginx
+      - --build-arg
+      - REGISTRY_BASE_URL=https://infra-vc-registry-web-911368042037.asia-east2.run.app
       - -t
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_IMAGE}:$SHORT_SHA
       - .
