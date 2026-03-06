@@ -47,7 +47,7 @@ Write-Host ""
 
 Write-Host "Testing DID Documents..." -ForegroundColor Yellow
 Write-Host ""
-Test-Endpoint "/issuers/iu/did.json" "IU Issuer DID Document"
+Test-Endpoint "/issuers/principle/did.json" "Principle Issuer DID Document"
 Test-Endpoint "/issuers/test-issuer/did.json" "Test Issuer DID Document"
 Test-Endpoint "/issuers/tmp-test/did.json" "Tmp Test Issuer DID Document"
 Write-Host ""
@@ -80,4 +80,3 @@ if ($ErrorCount -eq 0) {
     Write-Host "⚠️  Some tests failed. Check the output above." -ForegroundColor Yellow
     exit 1
 }
-

@@ -1,4 +1,4 @@
-const BASE_URL = "https://helena-unda-bounceably.ngrok-free.dev";
+const BASE_URL = "https://infra-vc-registry-web-911368042037.asia-east2.run.app";
 
 export const SAMPLE_IUSMARTCERT_VC = {
   "@context": [
@@ -11,7 +11,7 @@ export const SAMPLE_IUSMARTCERT_VC = {
   type: ["VerifiableCredential", "VNEduDegreeCredential", "IUSmartCertCredential"],
   id: "urn:uuid:example-degree-2025",
 
-  issuer: "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu",
+  issuer: "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle",
   validFrom: "2025-06-01T00:00:00Z",
 
   credentialSubject: {
@@ -76,7 +76,7 @@ export const SAMPLE_IUSMARTCERT_VC = {
     proofPurpose: "assertionMethod",
     created: "2025-06-20T09:12:03Z",
     verificationMethod:
-      "did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu#key-1",
+      "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle#key-1",
     proofValue: "zREAL_SIGNATURE_VALUE_HERE"
   }
 };

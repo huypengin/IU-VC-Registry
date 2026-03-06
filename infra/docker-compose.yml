@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: infra/Dockerfile.nginx
       args:
-        REGISTRY_BASE_URL: https://helena-unda-bounceably.ngrok-free.dev
+        REGISTRY_BASE_URL: https://infra-vc-registry-web-911368042037.asia-east2.run.app
     container_name: iu-did-web-static
     ports:
       - "8080:80"

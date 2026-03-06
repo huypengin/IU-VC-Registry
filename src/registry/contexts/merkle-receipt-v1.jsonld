@@ -5,7 +5,7 @@
     "id": "@id",
     "type": "@type",
 
-    "iu": "https://helena-unda-bounceably.ngrok-free.dev/vocab/iu#",
+    "iu": "https://infra-vc-registry-web-911368042037.asia-east2.run.app/vocab/iu#",
 
     "IUSmartCertMerkleReceipt": "iu:IUSmartCertMerkleReceipt",
 

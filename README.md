@@ -111,9 +111,9 @@ ngrok http 8080
 ```
 
 Your DID documents will be accessible at:
-- **Local**: `http://localhost:8080/issuers/iu/did.json`
-- **Public** (with ngrok): `https://abc123.ngrok-free.app/issuers/iu/did.json`
-- **DID Identifier**: `did:web:abc123.ngrok-free.app:issuers:iu`
+- **Local**: `http://localhost:8080/issuers/principle/did.json`
+- **Public** (with ngrok): `https://abc123.ngrok-free.app/issuers/principle/did.json`
+- **DID Identifier**: `did:web:abc123.ngrok-free.app:issuers:principle`
 
 📖 **[Full Docker Deployment Guide](.github/docs/docker-deployment-guide.md)**
 📖 **[ngrok Setup Guide](.github/docs/ngrok-setup-guide.md)**
@@ -275,9 +275,9 @@ npm run generate:issuer -- --did-domain "university.edu:dept" --issuer "dept-cs"
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--did-domain <domain>` | DID domain or full identifier | `helena-unda-bounceably.ngrok-free.dev:issuers:principle` |
+| `--did-domain <domain>` | DID domain or full identifier | `infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle` |
 | `--output <dir>` | Output directory for artifacts | `./src/registry/issuers/{issuer}` |
-| `--issuer <name>` | Issuer folder name | `iu` |
+| `--issuer <name>` | Issuer folder name | `principle` |
 | `--passphrase <pass>` | Passphrase for encryption | Environment variable |
 | `--encrypted` | Enable key encryption | `false` |
 
@@ -322,10 +322,10 @@ There are two convenient ways to run the command:
 node --loader ts-node/esm tools/registry-cli.ts validate
 
 # Generate keys for an issuer (writes into src/registry/issuers/<issuer> and then copies to public/)
-node --loader ts-node/esm tools/registry-cli.ts generate --issuer iu --did-domain vc.example.vn
+node --loader ts-node/esm tools/registry-cli.ts generate --issuer principle --did-domain vc.example.vn
 
 # Skip the build-to-public step if you only want to create files under src/
-node --loader ts-node/esm tools/registry-cli.ts generate --issuer iu --no-build
+node --loader ts-node/esm tools/registry-cli.ts generate --issuer principle --no-build
 ```
 
 2) Via npm scripts (shortcut wrappers defined in package.json):

@@ -43,7 +43,7 @@ export function loadMultikeyFromEnv(): Ed25519Multikey {
 
 export function getIssuerConfig() {
   return {
-    publicDomain: process.env.PUBLIC_DOMAIN || 'helena-unda-bounceably.ngrok-free.dev',
+    publicDomain: process.env.PUBLIC_DOMAIN || 'infra-vc-registry-web-911368042037.asia-east2.run.app',
     issuerDid: process.env.ISSUER_DID || '',
     issuerVerificationMethod: process.env.ISSUER_VERIFICATION_METHOD || '',
     multikey: loadMultikeyFromEnv()

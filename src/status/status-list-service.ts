@@ -123,7 +123,7 @@ export async function allocateStatusIndices(
       [endIndex, listId]
     );
 
-    const domain = process.env.PUBLIC_DOMAIN || 'helena-unda-bounceably.ngrok-free.dev';
+    const domain = process.env.PUBLIC_DOMAIN || 'infra-vc-registry-web-911368042037.asia-east2.run.app';
     const { category, year } = extractCategoryAndYear(listId);
     const statusListUrl = `https://${domain}/status/${category}/${year}/status-list.json`;
 

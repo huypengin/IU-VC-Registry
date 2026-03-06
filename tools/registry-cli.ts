@@ -15,7 +15,7 @@ const ROOT = path.resolve(__dirname, "..");
 const SRC = path.join(ROOT, "src", "registry");
 const PUBLIC = path.join(ROOT, "public");
 const REGISTRY_CONFIG_PATH = path.join(SRC, "registry.config.json");
-const DEFAULT_BASE_URL = "https://helena-unda-bounceably.ngrok-free.dev";
+const DEFAULT_BASE_URL = "https://infra-vc-registry-web-911368042037.asia-east2.run.app";
 const REGISTRY_BASE_URL_ENV = "REGISTRY_BASE_URL";
 
 type RegistryConfig = {
@@ -246,7 +246,7 @@ program
 program
   .command('generate')
   .description('Generate keys and inject into a did.json for an issuer')
-  .option('--issuer <name>', 'Issuer folder under src/registry/issuers', 'iu')
+  .option('--issuer <name>', 'Issuer folder under src/registry/issuers', 'principle')
   .option('--did-domain <domain>', 'DID domain or full DID identifier')
   .option('--output <path>', 'Output directory (defaults to src/registry/issuers/<issuer>)')
   .option('--encrypted', 'Encrypt private key output')

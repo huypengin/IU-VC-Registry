@@ -1,45 +1,40 @@
 {
-  "$id": "https://helena-unda-bounceably.ngrok-free.dev/credentialSchema/iu-smartcert-v1.schema.json",
+  "$id": "https://infra-vc-registry-web-911368042037.asia-east2.run.app/credentialSchema/iu-smartcert-v1.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "IU SmartCert Verifiable Credential v1",
   "type": "object",
   "additionalProperties": true,
+
   "properties": {
     "@context": {
       "description": "VC contexts including W3C VC v2 and IU custom contexts.",
       "type": "array",
       "items": {
-        "type": [
-          "string",
-          "object"
-        ]
+        "type": ["string", "object"]
       },
       "minItems": 1
     },
+
     "id": {
       "description": "Optional VC identifier.",
       "type": "string",
       "format": "uri"
     },
+
     "type": {
       "description": "VC types, must include VerifiableCredential and IU SmartCert types.",
       "oneOf": [
         {
           "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1,
-          "contains": {
-            "const": "VerifiableCredential"
-          }
+          "items": { "type": "string" },
+          "minItems": 1
         },
         {
-          "type": "string",
-          "const": "VerifiableCredential"
+          "type": "string"
         }
       ]
     },
+
     "issuer": {
       "description": "Issuer of the credential.",
       "oneOf": [
@@ -58,28 +53,30 @@
               "type": "string"
             }
           },
-          "required": [
-            "id"
-          ],
+          "required": ["id"],
           "additionalProperties": true
         }
       ]
     },
+
     "issuanceDate": {
       "description": "Date/time when the credential becomes valid (VC 1.1).",
       "type": "string",
       "format": "date-time"
     },
+
     "validFrom": {
       "description": "Validity start (VC 2.0).",
       "type": "string",
       "format": "date-time"
     },
+
     "validUntil": {
       "description": "Optional validity end.",
       "type": "string",
       "format": "date-time"
     },
+
     "credentialSchema": {
       "description": "Self-reference to this JSON Schema.",
       "type": "object",
@@ -92,40 +89,19 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "type"
-      ],
+      "required": ["id", "type"],
       "additionalProperties": true
     },
+
     "credentialStatus": {
       "description": "StatusList2021Entry for revocation status.",
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "uri"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "StatusList2021Entry"
-          ]
-        },
-        "statusPurpose": {
-          "type": "string",
-          "enum": [
-            "revocation"
-          ]
-        },
-        "statusListIndex": {
-          "type": "string",
-          "pattern": "^[0-9]+$"
-        },
-        "statusListCredential": {
-          "type": "string",
-          "format": "uri"
-        }
+        "id": { "type": "string", "format": "uri" },
+        "type": { "type": "string", "enum": ["StatusList2021Entry"] },
+        "statusPurpose": { "type": "string", "enum": ["revocation"] },
+        "statusListIndex": { "type": "string", "pattern": "^[0-9]+$" },
+        "statusListCredential": { "type": "string", "format": "uri" }
       },
       "required": [
         "id",
@@ -135,6 +111,7 @@
         "statusListCredential"
       ]
     },
+
     "credentialSubject": {
       "description": "IU SmartCert subject data.",
       "type": "object",
@@ -149,17 +126,10 @@
           "type": "object",
           "additionalProperties": true,
           "properties": {
-            "type": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            }
+            "type": { "type": "string" },
+            "name": { "type": "string" }
           },
-          "required": [
-            "type",
-            "name"
-          ]
+          "required": ["type", "name"]
         },
         "iu:components": {
           "description": "Component manifests anchored in Merkle tree.",
@@ -168,99 +138,30 @@
             "type": "object",
             "additionalProperties": true,
             "properties": {
-              "name": {
-                "type": "string"
-              },
-              "mandatory": {
-                "type": "boolean"
-              },
-              "componentType": {
-                "type": "string"
-              },
-              "componentHash": {
-                "type": "string"
-              }
+              "name": { "type": "string" },
+              "mandatory": { "type": "boolean" },
+              "componentType": { "type": "string" },
+              "componentHash": { "type": "string" }
             },
-            "required": [
-              "name",
-              "mandatory",
-              "componentType",
-              "componentHash"
-            ]
+            "required": ["name", "mandatory", "componentType", "componentHash"]
           }
         }
       },
-      "required": [
-        "id",
-        "degree",
-        "iu:components"
-      ]
+      "required": ["id", "degree", "iu:components"]
     },
+
     "iu:merkleReceipt": {
-      "description": "[LEGACY] IU SmartCert Merkle receipt. Phase 3: Prefer using 'evidence' field for Merkle anchoring data.",
+      "description": "IU SmartCert Merkle receipt.",
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "type": {
-          "type": "string"
-        },
-        "chainId": {
-          "type": "string"
-        },
-        "contractAddress": {
-          "type": "string",
-          "pattern": "^0x[a-fA-F0-9]{40}$"
-        },
-        "merkleRoot": {
-          "type": "string",
-          "pattern": "^0x[a-fA-F0-9]{64}$"
-        },
-        "anchorTx": {
-          "type": "string",
-          "pattern": "^0x[a-fA-F0-9]{64}$"
-        },
-        "hashAlg": {
-          "type": "string"
-        },
-        "leafEncoding": {
-          "type": "string"
-        },
-        "merkleTreeSpec": {
-          "description": "Phase 3: Deterministic Merkle tree construction parameters.",
-          "type": "object",
-          "properties": {
-            "hashAlg": {
-              "type": "string"
-            },
-            "sortPairs": {
-              "type": "boolean"
-            },
-            "sortLeaves": {
-              "type": "boolean"
-            }
-          },
-          "additionalProperties": true
-        },
-        "componentsProofs": {
-          "description": "Phase 3: Merkle proofs for each component.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "componentHash": {
-                "type": "string",
-                "pattern": "^0x[a-fA-F0-9]{64}$"
-              },
-              "proof": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "additionalProperties": true
-          }
-        }
+        "type": { "type": "string" },
+        "chainId": { "type": "string" },
+        "contractAddress": { "type": "string" },
+        "merkleRoot": { "type": "string" },
+        "anchorTx": { "type": "string" },
+        "hashAlg": { "type": "string" },
+        "leafEncoding": { "type": "string" }
       },
       "required": [
         "type",
@@ -272,154 +173,36 @@
         "leafEncoding"
       ]
     },
+
     "evidence": {
-      "description": "Phase 3: Standard VC evidence field for Merkle anchoring or other verifier-side artifacts.",
+      "description": "Optional evidence artifacts.",
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": true,
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uri"
-          },
+          "id": { "type": "string", "format": "uri" },
           "type": {
             "oneOf": [
-              {
-                "type": "string"
-              },
+              { "type": "string" },
               {
                 "type": "array",
-                "items": {
-                  "type": "string"
-                }
+                "items": { "type": "string" }
               }
             ]
           },
-          "digestMultibase": {
-            "type": "string"
-          },
-          "iu:purpose": {
-            "type": "string"
-          },
-          "chainId": {
-            "type": "string"
-          },
-          "contractAddress": {
-            "type": "string",
-            "pattern": "^0x[a-fA-F0-9]{40}$"
-          },
-          "merkleRoot": {
-            "type": "string",
-            "pattern": "^0x[a-fA-F0-9]{64}$"
-          },
-          "anchorTx": {
-            "type": "string",
-            "pattern": "^0x[a-fA-F0-9]{64}$"
-          },
-          "merkleTreeSpec": {
-            "description": "Deterministic Merkle tree construction parameters.",
-            "type": "object",
-            "properties": {
-              "hashAlg": {
-                "type": "string"
-              },
-              "sortPairs": {
-                "type": "boolean"
-              },
-              "sortLeaves": {
-                "type": "boolean"
-              }
-            },
-            "additionalProperties": true
-          },
-          "componentsProofs": {
-            "description": "Merkle proofs for each component.",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "componentHash": {
-                  "type": "string",
-                  "pattern": "^0x[a-fA-F0-9]{64}$"
-                },
-                "proof": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "additionalProperties": true
-            }
-          }
+          "digestMultibase": { "type": "string" },
+          "iu:purpose": { "type": "string" }
         },
-        "required": [
-          "id",
-          "type"
-        ]
+        "required": ["id", "type"]
       }
     },
+
     "proof": {
-      "description": "Phase 3: Proof must be object or array. Wallets do NOT put Merkle data here.",
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": true
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
-      ]
+      "description": "Proof object (JSON-LD Data Integrity / JOSE / COSE).",
+      "type": "object"
     }
   },
-  "required": [
-    "@context",
-    "type",
-    "issuer",
-    "credentialSubject",
-    "credentialSchema"
-  ],
-  "oneOf": [
-    {
-      "description": "Phase 3: VC 2.0 uses validFrom.",
-      "required": [
-        "validFrom"
-      ],
-      "not": {
-        "required": [
-          "issuanceDate"
-        ]
-      }
-    },
-    {
-      "description": "Phase 3: VC 1.1 uses issuanceDate.",
-      "required": [
-        "issuanceDate"
-      ],
-      "not": {
-        "required": [
-          "validFrom"
-        ]
-      }
-    }
-  ],
-  "anyOf": [
-    {
-      "description": "Phase 3: Issuer must provide Merkle anchoring via evidence (preferred).",
-      "required": [
-        "evidence"
-      ]
-    },
-    {
-      "description": "Phase 3: Or legacy iu:merkleReceipt (for backward compatibility).",
-      "required": [
-        "iu:merkleReceipt"
-      ]
-    }
-  ]
+
+  "required": ["@context", "type", "issuer", "credentialSubject", "validFrom", "credentialSchema"]
 }

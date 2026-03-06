@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { publickeyToMultibase, privatekeyToMultibase } from '../src/v1.0/crypto/convert-key.js';
 
-const issuerName = process.argv[2] || 'iu';
+const issuerName = process.argv[2] || 'principle';
 const keyFilePath = resolve(process.cwd(), `src/registry/issuers/${issuerName}/ed25519.keys.json`);
 const didFilePath = resolve(process.cwd(), `src/registry/issuers/${issuerName}/did.json`);
 
@@ -31,8 +31,8 @@ try {
     };
 
     console.log('\n=== Environment Variables ===\n');
-    console.log(`PUBLIC_DOMAIN=helena-unda-bounceably.ngrok-free.dev`);
-    console.log(`REGISTRY_BASE_URL=https://helena-unda-bounceably.ngrok-free.dev`);
+    console.log(`PUBLIC_DOMAIN=infra-vc-registry-web-911368042037.asia-east2.run.app`);
+    console.log(`REGISTRY_BASE_URL=https://infra-vc-registry-web-911368042037.asia-east2.run.app`);
     console.log(`ISSUER_DID=${controllerId}`);
     console.log(`ISSUER_VERIFICATION_METHOD=${keyId}`);
     console.log(`ISSUER_ED25519_PRIVATE_KEY=${keyData.privateKey}`);

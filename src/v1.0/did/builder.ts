@@ -5,7 +5,7 @@
 
 import { DIDDocument, VerificationMethod } from '../types/did';
 
-const DEFAULT_DID_SUFFIX = 'helena-unda-bounceably.ngrok-free.dev:issuers:principle';
+const DEFAULT_DID_SUFFIX = 'infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle';
 
 /**
  * Build a complete DID document from options

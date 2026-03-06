@@ -25,7 +25,7 @@ program
   .description('Create a DID document and key bundle for an issuer')
   .option('--did-domain <domain>', 'DID domain or full DID identifier to use in the document')
   .option('--output <dir>', 'Directory to write output artifacts', 'default')
-  .option('--issuer <name>', 'Issuer folder name under src/registry/issuers', 'iu')
+  .option('--issuer <name>', 'Issuer folder name under src/registry/issuers', 'principle')
   .option('--passphrase <pass>', 'Passphrase to encrypt the private key bundle')
   .option('--encrypted', 'Encrypt the private key bundle with the provided passphrase')
   .action(async (options: GenerateCommandOptions) => {
@@ -38,7 +38,7 @@ program
   });
 
 async function handleGenerateCommand(options: GenerateCommandOptions): Promise<void> {
-  const issuerName = options.issuer ?? 'iu';
+  const issuerName = options.issuer ?? 'principle';
   const resolvedOutput = options.output === 'default' ? undefined : options.output;
   const issuerDir = resolve(
     process.cwd(),

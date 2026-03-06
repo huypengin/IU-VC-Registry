@@ -34,11 +34,11 @@ export async function issueCredentialWithStatus(studentData: {
   const credential = {
     '@context': [
       'https://www.w3.org/2018/credentials/v1',
-      'https://helena-unda-bounceably.ngrok-free.dev/contexts/iu-edu-degree-v1.jsonld',
+      'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/iu-edu-degree-v1.jsonld',
     ],
     id: credentialId,
     type: ['VerifiableCredential', 'IUEducationDegreeCredential'],
-    issuer: 'did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu',
+    issuer: 'did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle',
     issuanceDate: new Date().toISOString(),
     
     // Credential subject (the student data)
@@ -52,11 +52,11 @@ export async function issueCredentialWithStatus(studentData: {
     
     // ✨ Add status information (THIS IS THE KEY PART)
     credentialStatus: {
-      id: `https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025/status-list.json#${statusListIndex}`,
+      id: `https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json#${statusListIndex}`,
       type: 'StatusList2021Entry',
       statusPurpose: 'revocation',
       statusListIndex: String(statusListIndex),
-      statusListCredential: 'https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025/status-list.json',
+      statusListCredential: 'https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json',
     },
   };
   
@@ -96,11 +96,11 @@ export async function issueBatchCredentials(students: Array<{
     return {
       '@context': [
         'https://www.w3.org/2018/credentials/v1',
-        'https://helena-unda-bounceably.ngrok-free.dev/contexts/iu-edu-degree-v1.jsonld',
+        'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/iu-edu-degree-v1.jsonld',
       ],
       id: credentialId,
       type: ['VerifiableCredential', 'IUEducationDegreeCredential'],
-      issuer: 'did:web:helena-unda-bounceably.ngrok-free.dev:issuers:iu',
+      issuer: 'did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle',
       issuanceDate: new Date().toISOString(),
       credentialSubject: {
         id: `did:web:student-${student.id}`,
@@ -110,11 +110,11 @@ export async function issueBatchCredentials(students: Array<{
         university: 'International University',
       },
       credentialStatus: {
-        id: `https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025/status-list.json#${statusListIndex}`,
+        id: `https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json#${statusListIndex}`,
         type: 'StatusList2021Entry',
         statusPurpose: 'revocation',
         statusListIndex: String(statusListIndex),
-        statusListCredential: 'https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025/status-list.json',
+        statusListCredential: 'https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json',
       },
     };
   });
@@ -153,7 +153,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  * 
  * 1. Extract statusListCredential URL from the credential
  * 2. Fetch the StatusList2021Credential:
- *    GET https://helena-unda-bounceably.ngrok-free.dev/status/degree/2025/status-list.json
+ *    GET https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json
  * 
  * 3. Extract encodedList from the response
  * 4. Decode: base64url -> GZIP -> bitstring
