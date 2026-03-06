@@ -26,3 +26,6 @@ substitutions:
   _AR_REPO: vc-registry
   _IMAGE: infra-vc-registry-web
   _SERVICE: infra-vc-registry-web
+
+options:
+  logging: CLOUD_LOGGING_ONLY
