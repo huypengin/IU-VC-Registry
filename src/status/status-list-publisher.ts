@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getStatusList } from './status-list-service.js';
 import { makeDocumentLoader, signAsDataIntegrity } from './di-signer.js';
-import { loadMultikeyFromEnv, getIssuerConfig } from '../v1.0/config/multikey.js';
+import { getIssuerConfig, loadEs256PrivateJwkFromEnv } from '../v1.0/config/multikey.js';
 
 const PUBLIC_REGISTRY_PATH = path.resolve('public/status');
 
@@ -37,16 +37,17 @@ export async function publishStatusList(listId: string): Promise<void> {
     publicUrl: statusList.publicUrl
   });
 
-  const keyPairJson = loadMultikeyFromEnv();
-  const documentLoader = makeDocumentLoader({ extraDocuments: {} });
+  const config = getIssuerConfig();
+  const privateKeyJwk = loadEs256PrivateJwkFromEnv();
+  const documentLoader = makeDocumentLoader();
 
   const signed = await signAsDataIntegrity({
     unsignedDocument: unsigned,
-    keyPairJson,
+    privateKeyJwk,
+    keyId: config.issuerVerificationMethod,
+    controller: config.issuerDid,
     documentLoader
   });
-
-  console.log('result sign', signed);
 
   await fs.writeFile(filePath, JSON.stringify(signed, null, 2), 'utf8');
   console.log(`✅ Published SIGNED status list: ${listId} -> ${filePath}`);
@@ -79,5 +80,3 @@ function buildUnsignedStatusList2021Credential({
     }
   };
 }
-
-

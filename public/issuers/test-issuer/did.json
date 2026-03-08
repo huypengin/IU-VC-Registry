@@ -1,17 +1,29 @@
 {
   "@context": [
-    "https://www.w3.org/ns/did/v1"
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
   ],
   "id": "did:web:test.example.com",
   "verificationMethod": [
     {
-      "id": "did:web:test.example.com:z6MkqKMMBPUiLG9zBqaH7oY4xgddwHWKFkV22UcAt7d2LftY",
-      "type": "Ed25519VerificationKey2020",
+      "id": "did:web:test.example.com#key-1",
+      "type": "JsonWebKey2020",
       "controller": "did:web:test.example.com",
-      "publicKeyMultibase": "z6MkqKMMBPUiLG9zBqaH7oY4xgddwHWKFkV22UcAt7d2LftY"
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "eR4eD9e5vTSk4xM1ySJqEJiTSKvnL5XwHQQ6iRiQgiM",
+        "y": "pr10y1Un6GsUXQmcZBV_wofUO86b4LN1PGdaosvAGG4",
+        "use": "sig",
+        "key_ops": [
+          "verify"
+        ],
+        "alg": "ES256",
+        "kid": "did:web:test.example.com#key-1"
+      }
     }
   ],
   "assertionMethod": [
-    "did:web:test.example.com:z6MkqKMMBPUiLG9zBqaH7oY4xgddwHWKFkV22UcAt7d2LftY"
+    "did:web:test.example.com#key-1"
   ]
 }

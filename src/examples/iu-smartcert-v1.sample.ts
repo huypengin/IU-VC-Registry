@@ -72,7 +72,7 @@ export const SAMPLE_IUSMARTCERT_VC = {
 
   proof: {
     type: "DataIntegrityProof",
-    cryptosuite: "eddsa-rdfc-2022",
+    cryptosuite: "ecdsa-rdfc-2019",
     proofPurpose: "assertionMethod",
     created: "2025-06-20T09:12:03Z",
     verificationMethod:

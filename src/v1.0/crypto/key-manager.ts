@@ -1,5 +1,7 @@
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto';
-import { Ed25519KeyPair, generateEd25519KeyPair } from './ed25519.js';
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'node:crypto';
+
+import type { JsonWebKey } from '../types/did.js';
+import { P256KeyPair, generateP256KeyPair } from './p256.js';
 
 const AES_ALGORITHM = 'aes-256-gcm';
 const DEFAULT_SCRYPT_COST = 1 << 15; // 32768
@@ -29,12 +31,12 @@ export interface EncryptedPrivateKeyBundle {
   ciphertext: string;
 }
 
-export interface GeneratedEncryptedEd25519KeyPair {
-  keyPair: Ed25519KeyPair;
+export interface GeneratedEncryptedP256KeyPair {
+  keyPair: P256KeyPair;
   encryptedPrivateKey: EncryptedPrivateKeyBundle;
 }
 
-export type GenerateEncryptedEd25519KeyPairOptions = Omit<KeyEncryptionOptions, 'passphrase'>;
+export type GenerateEncryptedP256KeyPairOptions = Omit<KeyEncryptionOptions, 'passphrase'>;
 
 function ensurePassphrase(passphrase: string): void {
   if (!passphrase || !passphrase.trim()) {
@@ -75,11 +77,18 @@ function deriveKey(
   });
 }
 
-export function encryptEd25519PrivateKey(
-  privateKey: Uint8Array,
+function assertPrivateKeyJwk(privateKeyJwk: JsonWebKey): void {
+  if (privateKeyJwk.kty !== 'EC' || privateKeyJwk.crv !== 'P-256' || !privateKeyJwk.d) {
+    throw new Error('Expected an ES256 private P-256 JWK.');
+  }
+}
+
+export function encryptPrivateKeyJwk(
+  privateKeyJwk: JsonWebKey,
   options: KeyEncryptionOptions
 ): EncryptedPrivateKeyBundle {
   ensurePassphrase(options.passphrase);
+  assertPrivateKeyJwk(privateKeyJwk);
 
   const salt = toBuffer(options.salt, SALT_LENGTH);
   const iv = toBuffer(options.iv, IV_LENGTH);
@@ -93,7 +102,8 @@ export function encryptEd25519PrivateKey(
   });
 
   const cipher = createCipheriv(AES_ALGORITHM, key, iv);
-  const ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKey)), cipher.final()]);
+  const plaintext = Buffer.from(JSON.stringify(privateKeyJwk), 'utf8');
+  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
   const authTag = cipher.getAuthTag();
 
   return {
@@ -109,10 +119,10 @@ export function encryptEd25519PrivateKey(
   };
 }
 
-export function decryptEd25519PrivateKey(
+export function decryptPrivateKeyJwk(
   bundle: EncryptedPrivateKeyBundle,
   passphrase: string
-): Uint8Array {
+): JsonWebKey {
   ensurePassphrase(passphrase);
 
   if (bundle.cipher !== AES_ALGORITHM) {
@@ -134,18 +144,20 @@ export function decryptEd25519PrivateKey(
 
   try {
     const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
-    return new Uint8Array(plaintext);
+    const jwk = JSON.parse(plaintext.toString('utf8')) as JsonWebKey;
+    assertPrivateKeyJwk(jwk);
+    return jwk;
   } catch (error) {
-    throw new Error('Failed to decrypt Ed25519 private key: invalid passphrase or corrupted payload.');
+    throw new Error('Failed to decrypt ES256 private key JWK: invalid passphrase or corrupted payload.');
   }
 }
 
-export function generateEncryptedEd25519KeyPair(
+export function generateEncryptedP256KeyPair(
   passphrase: string,
-  options?: GenerateEncryptedEd25519KeyPairOptions
-): GeneratedEncryptedEd25519KeyPair {
-  const keyPair = generateEd25519KeyPair();
-  const encryptedPrivateKey = encryptEd25519PrivateKey(keyPair.privateKey, {
+  options?: GenerateEncryptedP256KeyPairOptions
+): GeneratedEncryptedP256KeyPair {
+  const keyPair = generateP256KeyPair();
+  const encryptedPrivateKey = encryptPrivateKeyJwk(keyPair.privateKeyJwk, {
     passphrase,
     salt: options?.salt,
     iv: options?.iv,

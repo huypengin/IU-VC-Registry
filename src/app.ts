@@ -1,7 +1,7 @@
 /**
  * Main DID Creation Application
  * Orchestrates the three main components:
- * 1. Ed25519 key generation
+ * 1. ES256 / P-256 key generation
  * 2. DID document creation  
  * 3. Local HTTPS server
  */
@@ -9,7 +9,7 @@
 // Load environment variables from .env file (ES module compatible)
 import 'dotenv/config';
 
-import { generateEd25519KeyPair } from './v1.0/crypto/index.js';
+import { generateP256KeyPair } from './v1.0/crypto/index.js';
 import { buildDIDDocument, serializeDIDDocument } from './v1.0/did/index.js';
 import { startHTTPSServer } from './v1.0/server/index.js';
 import type { ServerConfig } from './v1.0/types/did.js';
@@ -18,19 +18,17 @@ import type { ServerConfig } from './v1.0/types/did.js';
  * Main DID creation workflow
  */
 export async function createDID(): Promise<void> {
-  console.log('🔑 Step 1: Generating Ed25519 keypair...');
+  console.log('🔑 Step 1: Generating ES256 / P-256 keypair...');
   
-  // Generate new Ed25519 keypair
-  const keyPair = generateEd25519KeyPair();
+  const keyPair = generateP256KeyPair();
   
-  console.log('✅ Generated Ed25519 keypair');
-  console.log('📋 Public Key (hex):', Buffer.from(keyPair.publicKey).toString('hex'));
-  console.log('🔗 Public Key (multibase):', keyPair.publicKeyMultibase);
+  console.log('✅ Generated ES256 / P-256 keypair');
+  console.log('📋 Public Key JWK:', JSON.stringify(keyPair.publicKeyJwk, null, 2));
   
   console.log('\n📄 Step 2: Building DID document...');
   
   // Build DID document for local serving
-  const didDocument = buildDIDDocument(keyPair.publicKeyMultibase);
+  const didDocument = buildDIDDocument(keyPair.publicKeyJwk);
   const didJson = serializeDIDDocument(didDocument);
   
   console.log('✅ Generated DID document');

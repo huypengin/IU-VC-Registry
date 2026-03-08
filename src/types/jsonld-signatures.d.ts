@@ -1,5 +1,4 @@
 declare module 'jsonld-signatures';
 declare module '@digitalbazaar/data-integrity';
-declare module '@digitalbazaar/eddsa-rdfc-2022-cryptosuite';
-declare module '@digitalbazaar/ed25519-multikey';
-
+declare module '@digitalbazaar/ecdsa-rdfc-2019-cryptosuite';
+declare module '@digitalbazaar/ecdsa-multikey';

@@ -1,17 +1,29 @@
 {
   "@context": [
-    "https://www.w3.org/ns/did/v1"
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
   ],
   "id": "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle",
   "verificationMethod": [
     {
-      "id": "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle:z6MknN7BwK9kVwGEgL7SVbRLw2V3KdzDfRPnvGPksLZxud7W",
-      "type": "Ed25519VerificationKey2020",
+      "id": "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle#key-1",
+      "type": "JsonWebKey2020",
       "controller": "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle",
-      "publicKeyMultibase": "z6MknN7BwK9kVwGEgL7SVbRLw2V3KdzDfRPnvGPksLZxud7W"
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "rPG60Ckq9zhI3h3lmCCoc54GvtXQb3e7AIGV6ajboro",
+        "y": "Apa1lz8YQkbgUohrWFDT-bjrNTKv_lxAoNHEMXuIYDU",
+        "use": "sig",
+        "key_ops": [
+          "verify"
+        ],
+        "alg": "ES256",
+        "kid": "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle#key-1"
+      }
     }
   ],
   "assertionMethod": [
-    "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle:z6MknN7BwK9kVwGEgL7SVbRLw2V3KdzDfRPnvGPksLZxud7W"
+    "did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle#key-1"
   ]
 }

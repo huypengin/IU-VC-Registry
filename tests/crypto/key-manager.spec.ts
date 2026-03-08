@@ -1,43 +1,49 @@
 import { describe, it, expect } from 'vitest';
 
 import {
-  generateEd25519KeyPair,
-  decryptEd25519PrivateKey,
-  encryptEd25519PrivateKey,
-  generateEncryptedEd25519KeyPair
+  generateP256KeyPair,
+  decryptPrivateKeyJwk,
+  encryptPrivateKeyJwk,
+  generateEncryptedP256KeyPair
 } from '../../src/v1.0/crypto/index.js';
 
 describe('key-manager', () => {
-  it('encrypts and decrypts an Ed25519 private key deterministically with provided salt/iv', () => {
-    const keyPair = generateEd25519KeyPair();
+  it('encrypts and decrypts an ES256 private JWK deterministically with provided salt/iv', () => {
+    const keyPair = generateP256KeyPair();
     const passphrase = 'test-passphrase';
     const salt = new Uint8Array(16).fill(1);
     const iv = new Uint8Array(12).fill(2);
 
-    const encrypted = encryptEd25519PrivateKey(keyPair.privateKey, {
+    const encrypted = encryptPrivateKeyJwk(keyPair.privateKeyJwk, {
       passphrase,
       salt,
       iv,
       scryptCost: 1 << 14
     });
 
-    const decrypted = decryptEd25519PrivateKey(encrypted, passphrase);
-    expect(decrypted).toEqual(keyPair.privateKey);
+    const decrypted = decryptPrivateKeyJwk(encrypted, passphrase);
+    expect(decrypted).toEqual(keyPair.privateKeyJwk);
+    expect(decrypted.kty).toBe('EC');
+    expect(decrypted.crv).toBe('P-256');
+    expect(decrypted.alg).toBe('ES256');
   });
 
-  it('generates encrypted key pairs and decrypts the private key successfully', () => {
+  it('generates encrypted P-256 key pairs and decrypts the private key successfully', () => {
     const passphrase = 'another-passphrase';
-    const { keyPair, encryptedPrivateKey } = generateEncryptedEd25519KeyPair(passphrase);
+    const { keyPair, encryptedPrivateKey } = generateEncryptedP256KeyPair(passphrase);
 
-    const decrypted = decryptEd25519PrivateKey(encryptedPrivateKey, passphrase);
-    expect(decrypted).toEqual(keyPair.privateKey);
+    const decrypted = decryptPrivateKeyJwk(encryptedPrivateKey, passphrase);
+    expect(decrypted).toEqual(keyPair.privateKeyJwk);
+    expect(keyPair.publicKeyJwk.kty).toBe('EC');
+    expect(keyPair.publicKeyJwk.crv).toBe('P-256');
+    expect(keyPair.publicKeyJwk.alg).toBe('ES256');
   });
 
   it('throws on wrong passphrase', () => {
     const passphrase = 'correct-passphrase';
     const wrongPassphrase = 'wrong-passphrase';
-    const { encryptedPrivateKey } = generateEncryptedEd25519KeyPair(passphrase);
+    const { encryptedPrivateKey } = generateEncryptedP256KeyPair(passphrase);
 
-    expect(() => decryptEd25519PrivateKey(encryptedPrivateKey, wrongPassphrase)).toThrow();
+    expect(() => decryptPrivateKeyJwk(encryptedPrivateKey, wrongPassphrase)).toThrow();
   });
 });

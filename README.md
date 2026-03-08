@@ -1,16 +1,16 @@
 # DID Web Creation System
 
-A complete TypeScript Node.js system for creating and serving W3C DID (Decentralized Identity) documents with Ed25519 cryptography, HTTPS serving, and Docker deployment.
+A complete TypeScript Node.js system for creating and serving W3C DID (Decentralized Identity) documents with ES256 / P-256 cryptography, HTTPS serving, and Docker deployment.
 
 ## 🏗️ Architecture Overview
 
 This system implements three main components for DID creation:
 
-### 1. 🔑 Ed25519 Key Generation (`src/v1.0/crypto/`)
-- Generate new Ed25519 keypairs
+### 1. 🔑 ES256 / P-256 Key Generation (`src/v1.0/crypto/`)
+- Generate new P-256 keypairs
+- Export public/private keys as JWK
 - Encrypt private keys with AES-256-GCM + scrypt KDF
 - Load/save keys from PEM files
-- Convert public keys to multibase format
 
 ### 2. 📄 DID Document Builder (`src/v1.0/did/`)
 - Create W3C compliant DID documents
@@ -24,7 +24,7 @@ This system implements three main components for DID creation:
 - Ngrok tunneling for public access
 
 ### 4. 🔧 Key Generator CLI (`src/registry/issuers/helper/`)
-- Generate Ed25519 keys and DID documents
+- Generate ES256 / P-256 keys and DID documents
 - Optional passphrase-based encryption
 - Automatic injection into issuer DID documents
 
@@ -36,8 +36,7 @@ This system implements three main components for DID creation:
 │   ├── v1.0/
 │   │   ├── crypto/
 │   │   │   ├── index.ts                        # Crypto module exports
-│   │   │   ├── ed25519.ts                      # Ed25519 key generation
-│   │   │   ├── convert-key.ts                  # Key format conversion
+│   │   │   ├── p256.ts                         # P-256 key generation
 │   │   │   └── key-manager.ts                  # Key encryption/decryption
 │   │   ├── did/
 │   │   │   ├── index.ts                        # DID module exports
@@ -62,7 +61,7 @@ This system implements three main components for DID creation:
 │   ├── Dockerfile                               # Container configuration
 │   └── docker-compose.yml                       # Multi-service orchestration
 ├── certs/                                       # SSL certificates (gitignored)
-├── keys/                                        # Ed25519 keys (gitignored)
+├── keys/                                        # Key material (gitignored)
 ├── data/                                        # Application data (gitignored)
 ├── dist/                                        # Compiled JavaScript
 ├── index.ts                                     # Application entry point
@@ -220,14 +219,14 @@ KEY_ENCRYPTION_PASSPHRASE=your-secure-passphrase
 
 ## 🔐 Security Features
 
-- **Ed25519 Cryptography**: Modern elliptic curve signatures
+- **ES256 / P-256 Cryptography**: Broad wallet compatibility with EC JWKs
 - **AES-256-GCM Encryption**: Secure private key encryption with authenticated encryption
 - **Scrypt KDF**: Password-based key derivation with configurable cost
 - **HTTPS/TLS**: Encrypted communication
 - **Docker Security**: Containerized execution with non-root user
 - **Private Key Protection**: Keys are gitignored and optionally encrypted
 - **Environment Variables**: Sensitive config via environment
-- **Repository Hygiene**: Raw (`ed25519.keys.json`) and encrypted (`ed25519.encrypted.json`) key bundles are ignored via `.gitignore`. If you need to publish an example, rename it to `ed25519.keys.example.json` and strip the private key.
+- **Repository Hygiene**: Raw (`es256.keys.json`) and encrypted (`es256.encrypted.json`) key bundles are ignored via `.gitignore`. If you need to publish an example, rename it to `es256.keys.example.json` and strip the private key.
 
 ## 📖 Documentation
 
@@ -285,25 +284,35 @@ npm run generate:issuer -- --did-domain "university.edu:dept" --issuer "dept-cs"
 
 **Unencrypted:**
 - `did.json` - W3C compliant DID document
-- `ed25519.keys.json` - Raw key material (base64-encoded)
+- `es256.keys.json` - Raw ES256 key material (JWK)
 
 **Encrypted:**
 - `did.json` - W3C compliant DID document
-- `ed25519.encrypted.json` - Encrypted key bundle with scrypt parameters
+- `es256.encrypted.json` - Encrypted ES256 key bundle with scrypt parameters
 
 ### Example Output
 
 ```json
 {
-  "@context": ["https://www.w3.org/ns/did/v1"],
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
   "id": "did:web:vc.example.vn:iu",
   "verificationMethod": [{
-    "id": "did:web:vc.example.vn:iu:z6Mk...",
-    "type": "Ed25519VerificationKey2020",
+    "id": "did:web:vc.example.vn:iu#key-1",
+    "type": "JsonWebKey2020",
     "controller": "did:web:vc.example.vn:iu",
-    "publicKeyMultibase": "z6Mk..."
+    "publicKeyJwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "...",
+      "y": "...",
+      "alg": "ES256",
+      "kid": "did:web:vc.example.vn:iu#key-1"
+    }
   }],
-  "assertionMethod": ["did:web:vc.example.vn:iu:z6Mk..."]
+  "assertionMethod": ["did:web:vc.example.vn:iu#key-1"]
 }
 ```
 
@@ -340,7 +349,7 @@ npm run registry:build
 
 Notes
 - The `generate` command will by default run the `build` step after generation to update `public/`. Use `--no-build` to skip copying to `public/`.
-- Generated private key files (e.g. `ed25519.keys.json`, `ed25519.encrypted.json`) are explicitly ignored in `.gitignore`. Never commit them.
+- Generated private key files (e.g. `es256.keys.json`, `es256.encrypted.json`) are explicitly ignored in `.gitignore`. Never commit them.
 - When running inside Docker build (the provided `infra/Dockerfile.nginx`), the builder stage uses `node --loader ts-node/esm` so TS entrypoints run correctly.
 
 If you want a short alias, you can add a script to `package.json`:

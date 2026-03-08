@@ -1,11 +1,23 @@
 {
-  "@context": ["https://www.w3.org/ns/did/v1"],
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
   "id": "did:web:iu.schema:issuers:principle",
   "verificationMethod": [{
-    "id": "did:web:iu.schema:issuers:principle:z6Mki...yourPublicKey...",
-    "type": "Ed25519VerificationKey2020",
+    "id": "did:web:iu.schema:issuers:principle#key-1",
+    "type": "JsonWebKey2020",
     "controller": "did:web:iu.schema:issuers:principle",
-    "publicKeyMultibase": "z6Mki...yourPublicKey..."
+    "publicKeyJwk": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "REPLACE_WITH_PUBLIC_X",
+      "y": "REPLACE_WITH_PUBLIC_Y",
+      "use": "sig",
+      "key_ops": ["verify"],
+      "alg": "ES256",
+      "kid": "did:web:iu.schema:issuers:principle#key-1"
+    }
   }],
-  "assertionMethod": ["did:web:iu.schema:issuers:principle:z6Mki...yourPublicKey..."]
+  "assertionMethod": ["did:web:iu.schema:issuers:principle#key-1"]
 }

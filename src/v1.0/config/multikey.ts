@@ -1,52 +1,58 @@
 import 'dotenv/config';
 
-export interface Ed25519Multikey {
-  '@context': string;
-  type: string;
-  controller: string;
-  id: string;
-  publicKeyMultibase: string;
-  secretKeyMultibase: string;
+import type { JsonWebKey } from '../types/did.js';
+
+export interface IssuerEs256PrivateJwk extends JsonWebKey {
+  kty: 'EC';
+  crv: 'P-256';
+  d: string;
+  x: string;
+  y: string;
 }
 
-export function loadMultikeyFromEnv(): Ed25519Multikey {
-  const multikeyJson = process.env.ED25519_MULTIKEY_JSON;
-  
-  if (!multikeyJson) {
-    throw new Error('ED25519_MULTIKEY_JSON environment variable is not set');
+function validateEs256PrivateJwk(jwk: JsonWebKey): asserts jwk is IssuerEs256PrivateJwk {
+  if (jwk.kty !== 'EC') {
+    throw new Error('Expected ES256 private JWK with kty="EC".');
+  }
+  if (jwk.crv !== 'P-256') {
+    throw new Error('Expected ES256 private JWK with crv="P-256".');
+  }
+  if (!jwk.x || !jwk.y || !jwk.d) {
+    throw new Error('Expected ES256 private JWK with x, y, and d values.');
+  }
+}
+
+export function loadEs256PrivateJwkFromEnv(): IssuerEs256PrivateJwk {
+  const jwkJson = process.env.ES256_PRIVATE_JWK_JSON ?? process.env.ES256_JWK_JSON;
+
+  if (!jwkJson) {
+    throw new Error('ES256_PRIVATE_JWK_JSON environment variable is not set');
   }
 
   try {
-    const multikey = JSON.parse(multikeyJson);
-    
-    if (!multikey.secretKeyMultibase) {
-      throw new Error('Multikey is missing secretKeyMultibase');
-    }
-    
-    if (!multikey.publicKeyMultibase) {
-      throw new Error('Multikey is missing publicKeyMultibase');
-    }
-    
-    if (!multikey.controller) {
-      throw new Error('Multikey is missing controller');
-    }
-    
-    if (!multikey.id) {
-      throw new Error('Multikey is missing id');
-    }
-    
-    return multikey as Ed25519Multikey;
+    const jwk = JSON.parse(jwkJson) as JsonWebKey;
+    validateEs256PrivateJwk(jwk);
+
+    return {
+      ...jwk,
+      use: jwk.use ?? 'sig',
+      key_ops: jwk.key_ops ?? ['sign'],
+      alg: jwk.alg ?? 'ES256'
+    };
   } catch (error) {
-    throw new Error(`Failed to parse ED25519_MULTIKEY_JSON: ${error}`);
+    throw new Error(`Failed to parse ES256_PRIVATE_JWK_JSON: ${error}`);
   }
 }
 
 export function getIssuerConfig() {
+  const privateKeyJwk = loadEs256PrivateJwkFromEnv();
+  const issuerDid = process.env.ISSUER_DID || '';
+  const issuerVerificationMethod = process.env.ISSUER_VERIFICATION_METHOD || privateKeyJwk.kid || '';
+
   return {
     publicDomain: process.env.PUBLIC_DOMAIN || 'infra-vc-registry-web-911368042037.asia-east2.run.app',
-    issuerDid: process.env.ISSUER_DID || '',
-    issuerVerificationMethod: process.env.ISSUER_VERIFICATION_METHOD || '',
-    multikey: loadMultikeyFromEnv()
+    issuerDid,
+    issuerVerificationMethod,
+    privateKeyJwk
   };
 }
-

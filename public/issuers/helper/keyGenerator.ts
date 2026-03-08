@@ -5,7 +5,11 @@ import { fileURLToPath } from 'url';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { Command } from 'commander';
 import { buildDIDDocument, serializeDIDDocument } from '../../../v1.0/did/index.js';
-import { generateEd25519KeyPair, generateEncryptedEd25519KeyPair } from '../../../v1.0/crypto/index.js';
+import {
+  assignKeyId,
+  encryptPrivateKeyJwk,
+  generateP256KeyPair
+} from '../../../v1.0/crypto/index.js';
 
 interface GenerateCommandOptions {
   didDomain?: string;
@@ -18,7 +22,7 @@ interface GenerateCommandOptions {
 const program = new Command();
 program
   .name('key-generator')
-  .description('Generate Ed25519 key material and inject it into issuer DID documents');
+  .description('Generate ES256 / P-256 key material and inject it into issuer DID documents');
 
 program
   .command('generate')
@@ -53,21 +57,34 @@ async function handleGenerateCommand(options: GenerateCommandOptions): Promise<v
     throw new Error('Passphrase is required when --encrypted is set. Provide --passphrase or KEY_ENCRYPTION_PASSPHRASE.');
   }
 
-  const keyResult = options.encrypted
-    ? generateEncryptedEd25519KeyPair(passphrase as string)
-    : { keyPair: generateEd25519KeyPair() };
+  const initialKeyPair = generateP256KeyPair();
 
-  const didDocument = buildDIDDocument(keyResult.keyPair.publicKeyMultibase, options.didDomain);
+  const didDocument = buildDIDDocument(initialKeyPair.publicKeyJwk, options.didDomain);
+  const keyId = didDocument.verificationMethod?.[0]?.id;
+  if (!keyId) {
+    throw new Error('Generated DID document is missing a verification method id.');
+  }
+  const keyPair = assignKeyId(initialKeyPair, keyId);
   const didPath = resolve(issuerDir, 'did.json');
   writeFileSync(didPath, serializeDIDDocument(didDocument));
 
-  const keyBundlePath = resolve(issuerDir, options.encrypted ? 'ed25519.encrypted.json' : 'ed25519.keys.json');
+  const keyBundlePath = resolve(issuerDir, options.encrypted ? 'es256.encrypted.json' : 'es256.keys.json');
   const keyPayload = options.encrypted
-    ? keyResult
+    ? {
+        algorithm: 'ES256',
+        curve: 'P-256',
+        keyPair: {
+          publicKeyJwk: keyPair.publicKeyJwk
+        },
+        encryptedPrivateKey: encryptPrivateKeyJwk(keyPair.privateKeyJwk, {
+          passphrase: passphrase as string
+        })
+      }
     : {
-        publicKey: Buffer.from(keyResult.keyPair.publicKey).toString('base64'),
-        privateKey: Buffer.from(keyResult.keyPair.privateKey).toString('base64'),
-        publicKeyMultibase: keyResult.keyPair.publicKeyMultibase
+        algorithm: 'ES256',
+        curve: 'P-256',
+        publicKeyJwk: keyPair.publicKeyJwk,
+        privateKeyJwk: keyPair.privateKeyJwk
       };
 
   writeFileSync(keyBundlePath, JSON.stringify(keyPayload, null, 2));

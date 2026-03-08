@@ -5,6 +5,7 @@
 
 // JsonWebKey interface for JWK format public keys
 export interface JsonWebKey {
+  [key: string]: unknown;
   kty: string;
   crv?: string;
   x?: string;
@@ -43,7 +44,6 @@ export interface VerificationMethod {
   id: string;
   type: string;
   controller: string;
-  publicKeyMultibase?: string;
   publicKeyJwk?: JsonWebKey;
 }
 
@@ -55,6 +55,6 @@ export interface ServiceEndpoint {
 
 export interface DIDCreationOptions {
   method: string;
-  publicKeyMultibase: string;
+  publicKeyJwk: JsonWebKey;
   serviceEndpoints?: ServiceEndpoint[];
 }

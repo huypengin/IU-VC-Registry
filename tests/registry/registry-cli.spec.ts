@@ -106,7 +106,7 @@ describe('Registry CLI', () => {
       
       // Verify files were created
       const didPath = path.join(testIssuerDir, 'did.json');
-      const keysPath = path.join(testIssuerDir, 'ed25519.keys.json');
+      const keysPath = path.join(testIssuerDir, 'es256.keys.json');
       
       expect(fs.existsSync(didPath)).toBe(true);
       expect(fs.existsSync(keysPath)).toBe(true);
@@ -117,12 +117,23 @@ describe('Registry CLI', () => {
       expect(didDoc.verificationMethod).toBeDefined();
       expect(Array.isArray(didDoc.verificationMethod)).toBe(true);
       expect(didDoc.verificationMethod.length).toBeGreaterThan(0);
+      expect(didDoc.verificationMethod[0].type).toBe('JsonWebKey2020');
+      expect(didDoc.verificationMethod[0].publicKeyJwk.kty).toBe('EC');
+      expect(didDoc.verificationMethod[0].publicKeyJwk.crv).toBe('P-256');
+      expect(didDoc.verificationMethod[0].publicKeyJwk.alg).toBe('ES256');
+      expect(didDoc.verificationMethod[0].publicKeyMultibase).toBeUndefined();
+      expect(didDoc.assertionMethod).toEqual([`${didDoc.id}#key-1`]);
       
       // Verify keys file structure
       const keys = JSON.parse(fs.readFileSync(keysPath, 'utf8'));
-      expect(keys.publicKey).toBeDefined();
-      expect(keys.privateKey).toBeDefined();
-      expect(keys.publicKeyMultibase).toBeDefined();
+      expect(keys.algorithm).toBe('ES256');
+      expect(keys.curve).toBe('P-256');
+      expect(keys.publicKeyJwk.kty).toBe('EC');
+      expect(keys.publicKeyJwk.crv).toBe('P-256');
+      expect(keys.publicKeyJwk.alg).toBe('ES256');
+      expect(keys.privateKeyJwk.kty).toBe('EC');
+      expect(keys.privateKeyJwk.crv).toBe('P-256');
+      expect(keys.privateKeyJwk.alg).toBe('ES256');
     });
 
     it('should generate encrypted keys when --encrypted flag is used', { timeout: 15000 }, () => {
@@ -136,12 +147,17 @@ describe('Registry CLI', () => {
       expect(hasSuccess).toBe(true);
       
       // Verify encrypted key file was created
-      const encryptedKeysPath = path.join(testIssuerDir, 'ed25519.encrypted.json');
+      const encryptedKeysPath = path.join(testIssuerDir, 'es256.encrypted.json');
       expect(fs.existsSync(encryptedKeysPath)).toBe(true);
       
       // Verify encrypted bundle structure
       const encryptedBundle = JSON.parse(fs.readFileSync(encryptedKeysPath, 'utf8'));
+      expect(encryptedBundle.algorithm).toBe('ES256');
+      expect(encryptedBundle.curve).toBe('P-256');
       expect(encryptedBundle.keyPair).toBeDefined();
+      expect(encryptedBundle.keyPair.publicKeyJwk.kty).toBe('EC');
+      expect(encryptedBundle.keyPair.publicKeyJwk.crv).toBe('P-256');
+      expect(encryptedBundle.keyPair.publicKeyJwk.alg).toBe('ES256');
       expect(encryptedBundle.encryptedPrivateKey).toBeDefined();
       
       // Check encrypted private key structure
@@ -178,10 +194,15 @@ describe('Registry CLI', () => {
       // Verify files in both src and public
       expect(fs.existsSync(path.join(testIssuerDir, 'did.json'))).toBe(true);
       expect(fs.existsSync(path.join(publicIssuerDir, 'did.json'))).toBe(true);
+      expect(fs.existsSync(path.join(publicIssuerDir, 'es256.keys.json'))).toBe(false);
+      expect(fs.existsSync(path.join(publicIssuerDir, 'es256.encrypted.json'))).toBe(false);
       
       // Cleanup
       if (fs.existsSync(testIssuerDir)) {
         fs.rmSync(testIssuerDir, { recursive: true, force: true });
+      }
+      if (fs.existsSync(publicIssuerDir)) {
+        fs.rmSync(publicIssuerDir, { recursive: true, force: true });
       }
     });
 
@@ -219,4 +240,3 @@ describe('Registry CLI', () => {
     });
   });
 });
-

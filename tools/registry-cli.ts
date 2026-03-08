@@ -72,6 +72,9 @@ function copyDir(
         if (stat.isDirectory()) {
             copyDir(srcPath, destPath, transform);
         } else {
+            if (shouldSkipPrivateArtifact(srcPath)) {
+                continue;
+            }
             if (transform && shouldRewriteFile(srcPath)) {
                 const raw = fs.readFileSync(srcPath, "utf8");
                 const rewritten = transform(srcPath, raw);
@@ -81,6 +84,10 @@ function copyDir(
             }
         }
     }
+}
+
+function shouldSkipPrivateArtifact(filePath: string): boolean {
+    return filePath.endsWith('.keys.json') || filePath.endsWith('.encrypted.json');
 }
 
 function normalizeBaseUrl(value?: string): string | undefined {
