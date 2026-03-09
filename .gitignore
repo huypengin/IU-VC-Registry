@@ -176,7 +176,6 @@ data/
 *.swp
 *.swo
 .github/*
-.worktrees/
 
 # OS
 .DS_Store

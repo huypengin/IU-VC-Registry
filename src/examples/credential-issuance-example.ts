@@ -22,25 +22,24 @@ export async function issueCredentialWithStatus(studentData: {
   const credentialId = `urn:uuid:${studentData.id}`;
   
   console.log('🔢 Allocating status index...');
-  const [allocation] = await allocateStatusIndices(
+  const [statusListIndex] = await allocateStatusIndices(
     listId,
     1,  // Allocate 1 index
     credentialId
   );
   
-  console.log(`✅ Allocated index: ${allocation.index}`);
+  console.log(`✅ Allocated index: ${statusListIndex}`);
   
   // 2. Build the verifiable credential
   const credential = {
     '@context': [
-      'https://www.w3.org/ns/credentials/v2',
-      'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/vn-edu-statuslist-v1.jsonld',
+      'https://www.w3.org/2018/credentials/v1',
       'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/iu-edu-degree-v1.jsonld',
     ],
     id: credentialId,
     type: ['VerifiableCredential', 'IUEducationDegreeCredential'],
     issuer: 'did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle',
-    validFrom: new Date().toISOString(),
+    issuanceDate: new Date().toISOString(),
     
     // Credential subject (the student data)
     credentialSubject: {
@@ -52,7 +51,13 @@ export async function issueCredentialWithStatus(studentData: {
     },
     
     // ✨ Add status information (THIS IS THE KEY PART)
-    credentialStatus: allocation.credentialStatus,
+    credentialStatus: {
+      id: `https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json#${statusListIndex}`,
+      type: 'StatusList2021Entry',
+      statusPurpose: 'revocation',
+      statusListIndex: String(statusListIndex),
+      statusListCredential: 'https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json',
+    },
   };
   
   console.log('📜 Credential with status:', JSON.stringify(credential, null, 2));
@@ -80,24 +85,23 @@ export async function issueBatchCredentials(students: Array<{
   
   // 1. Allocate batch of indices
   console.log(`🔢 Allocating ${students.length} status indices...`);
-  const allocations = await allocateStatusIndices(listId, students.length);
-  console.log(`✅ Allocated indices: ${allocations[0].index} to ${allocations[allocations.length - 1].index}`);
+  const indices = await allocateStatusIndices(listId, students.length);
+  console.log(`✅ Allocated indices: ${indices[0]} to ${indices[indices.length - 1]}`);
   
   // 2. Create credentials with allocated indices
   const credentials = students.map((student, i) => {
-    const allocation = allocations[i];
+    const statusListIndex = indices[i];
     const credentialId = `urn:uuid:${student.id}`;
     
     return {
       '@context': [
-        'https://www.w3.org/ns/credentials/v2',
-        'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/vn-edu-statuslist-v1.jsonld',
+        'https://www.w3.org/2018/credentials/v1',
         'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/iu-edu-degree-v1.jsonld',
       ],
       id: credentialId,
       type: ['VerifiableCredential', 'IUEducationDegreeCredential'],
       issuer: 'did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle',
-      validFrom: new Date().toISOString(),
+      issuanceDate: new Date().toISOString(),
       credentialSubject: {
         id: `did:web:student-${student.id}`,
         name: student.name,
@@ -105,7 +109,13 @@ export async function issueBatchCredentials(students: Array<{
         gpa: student.gpa,
         university: 'International University',
       },
-      credentialStatus: allocation.credentialStatus,
+      credentialStatus: {
+        id: `https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json#${statusListIndex}`,
+        type: 'StatusList2021Entry',
+        statusPurpose: 'revocation',
+        statusListIndex: String(statusListIndex),
+        statusListCredential: 'https://infra-vc-registry-web-911368042037.asia-east2.run.app/status/degree/2025/status-list.json',
+      },
     };
   });
   
@@ -151,3 +161,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  *    - bit = 0: ✅ Valid (not revoked)
  *    - bit = 1: ❌ Revoked
  */
+

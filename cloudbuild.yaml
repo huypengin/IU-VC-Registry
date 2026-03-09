@@ -1,7 +1,3 @@
-# Static nginx-only deployment.
-# This serves the built `public/` tree but does not provide writable runtime-backed `/status/**`.
-# Wallet-visible live revocation requires the Node registry runtime or another mutable backing store
-# serving the same stable `/status/<category>/<year>/status-list.json` URL.
 steps:
   - name: gcr.io/cloud-builders/docker
     args:
