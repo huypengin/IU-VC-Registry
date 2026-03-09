@@ -1,6 +1,8 @@
 
 services:
-  # Nginx web server (serves static files only)
+  # Nginx web server (serves static files only).
+  # This is enough for contexts/schemas/DID docs, but not for live wallet-visible revocation
+  # unless `/status/**` is mounted from writable runtime-backed storage.
   vc-registry-web:
     build:
       context: ..

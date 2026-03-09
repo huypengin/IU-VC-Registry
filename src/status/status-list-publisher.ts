@@ -1,8 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getStatusList } from './status-list-service.js';
-import { makeDocumentLoader, signAsDataIntegrity } from './di-signer.js';
-import { getIssuerConfig, loadEs256PrivateJwkFromEnv } from '../v1.0/config/multikey.js';
+import { getIssuerConfig } from '../v1.0/config/multikey.js';
 
 const PUBLIC_REGISTRY_PATH = path.resolve('public/status');
 
@@ -11,6 +10,7 @@ interface StatusList2021CredentialParams {
   encodedList: string;
   statusPurpose: string;
   publicUrl: string;
+  issuerDid?: string;
 }
 
 export async function publishStatusList(listId: string): Promise<void> {
@@ -37,41 +37,30 @@ export async function publishStatusList(listId: string): Promise<void> {
     publicUrl: statusList.publicUrl
   });
 
-  const config = getIssuerConfig();
-  const privateKeyJwk = loadEs256PrivateJwkFromEnv();
-  const documentLoader = makeDocumentLoader();
-
-  const signed = await signAsDataIntegrity({
-    unsignedDocument: unsigned,
-    privateKeyJwk,
-    keyId: config.issuerVerificationMethod,
-    controller: config.issuerDid,
-    documentLoader
-  });
-
-  await fs.writeFile(filePath, JSON.stringify(signed, null, 2), 'utf8');
-  console.log(`✅ Published SIGNED status list: ${listId} -> ${filePath}`);
+  await fs.writeFile(filePath, JSON.stringify(unsigned, null, 2), 'utf8');
+  console.log(`✅ Published status list: ${listId} -> ${filePath}`);
 }
 
-function buildUnsignedStatusList2021Credential({
+export function buildUnsignedStatusList2021Credential({
   listId,
   encodedList,
   statusPurpose,
-  publicUrl
+  publicUrl,
+  issuerDid
 }: StatusList2021CredentialParams): any {
   const now = new Date().toISOString();
-  const config = getIssuerConfig();
+  const resolvedIssuerDid = issuerDid ?? getIssuerConfig().issuerDid;
 
   return {
     "@context": [
-      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/ns/credentials/v2",
       "https://w3id.org/vc/status-list/2021/v1",
-        'https://w3id.org/security/data-integrity/v2'
+      "https://w3id.org/security/data-integrity/v2"
     ],
     id: publicUrl,
     type: ["VerifiableCredential", "StatusList2021Credential"],
-    issuer: config.issuerDid,
-    issuanceDate: now,
+    issuer: resolvedIssuerDid,
+    validFrom: now,
     credentialSubject: {
       id: `${publicUrl}#list`,
       type: "StatusList2021",

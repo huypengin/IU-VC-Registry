@@ -32,6 +32,7 @@ function getRegistryStaticRoot(): string {
 const CONTEXTS_DIR = path.join(getRegistryStaticRoot(), 'contexts');
 const LOCAL_CONTEXTS: Record<string, any> = {
   'https://www.w3.org/2018/credentials/v1': readJson(path.join(CONTEXTS_DIR, 'vc-v1.json')),
+  'https://www.w3.org/ns/credentials/v2': readJson(path.join(CONTEXTS_DIR, 'vc-v2.json')),
   'https://w3id.org/vc/status-list/2021/v1': readJson(path.join(CONTEXTS_DIR, 'status-list-2021-v1.json')),
   'https://w3id.org/security/data-integrity/v2': readJson(path.join(CONTEXTS_DIR, 'data-integrity-v2.json')),
   'https://w3id.org/security/multikey/v1': readJson(path.join(CONTEXTS_DIR, 'multikey-v1.json'))

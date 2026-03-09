@@ -39,10 +39,53 @@ export interface AuditLog {
 export interface StatusAllocation {
   index: number;
   credentialStatus: {
+    id?: string;
     type: string;
     statusPurpose: string;
     statusListIndex: string;
     statusListCredential: string;
+  };
+}
+
+function normalizeBaseUrl(baseUrl: string): string {
+  const trimmed = baseUrl.trim().replace(/\/+$/, '');
+  if (!trimmed) {
+    throw new Error('Status list base URL is required');
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
+function getStatusListBaseUrl(): string {
+  const configured =
+    process.env.REGISTRY_BASE_URL
+    ?? process.env.PUBLIC_DOMAIN
+    ?? 'https://infra-vc-registry-web-911368042037.asia-east2.run.app';
+  return normalizeBaseUrl(configured);
+}
+
+export function buildStatusListPublicUrl(listId: string, baseUrl: string): string {
+  const { category, year } = extractCategoryAndYear(listId);
+  return `${normalizeBaseUrl(baseUrl)}/status/${category}/${year}/status-list.json`;
+}
+
+export function buildCredentialStatusEntry(input: {
+  statusListCredential: string;
+  statusListIndex: number | string;
+  statusPurpose: string;
+  includeId?: boolean;
+}): StatusAllocation['credentialStatus'] {
+  const statusListIndex = String(input.statusListIndex);
+  return {
+    ...(input.includeId === false
+      ? {}
+      : { id: `${input.statusListCredential}#${statusListIndex}` }),
+    type: 'StatusList2021Entry',
+    statusPurpose: input.statusPurpose,
+    statusListIndex,
+    statusListCredential: input.statusListCredential
   };
 }
 
@@ -69,9 +112,7 @@ export async function initStatusList(
       .replace(/\//g, '_')
       .replace(/=/g, '');
 
-    const { category, year } = extractCategoryAndYear(listId);
-    const domain = process.env.PUBLIC_DOMAIN || 'localhost';
-    const publicUrl = `https://${domain}/status/${category}/${year}/status-list.json`;
+    const publicUrl = buildStatusListPublicUrl(listId, getStatusListBaseUrl());
 
     const result = await client.query(
       `INSERT INTO status_lists (id, next_index, encoded_list, size, status_purpose, public_url)
@@ -123,9 +164,7 @@ export async function allocateStatusIndices(
       [endIndex, listId]
     );
 
-    const domain = process.env.PUBLIC_DOMAIN || 'infra-vc-registry-web-911368042037.asia-east2.run.app';
-    const { category, year } = extractCategoryAndYear(listId);
-    const statusListUrl = `https://${domain}/status/${category}/${year}/status-list.json`;
+    const statusListUrl = buildStatusListPublicUrl(listId, getStatusListBaseUrl());
 
     const allocations: StatusAllocation[] = [];
     for (let i = startIndex; i < endIndex; i++) {
@@ -139,12 +178,11 @@ export async function allocateStatusIndices(
       
       allocations.push({
         index: i,
-        credentialStatus: {
-          type: 'StatusList2021Entry',
-          statusPurpose: status_purpose,
-          statusListIndex: String(i),
-          statusListCredential: statusListUrl
-        }
+        credentialStatus: buildCredentialStatusEntry({
+          statusListCredential: statusListUrl,
+          statusListIndex: i,
+          statusPurpose: status_purpose
+        })
       });
     }
 
@@ -318,4 +356,3 @@ function base64urlToBuffer(b64url: string) {
     while (b64.length % 4) b64 += '=';
     return Buffer.from(b64, 'base64');
 }
-
