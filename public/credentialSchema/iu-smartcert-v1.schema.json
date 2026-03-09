@@ -104,7 +104,6 @@
         "statusListCredential": { "type": "string", "format": "uri" }
       },
       "required": [
-        "id",
         "type",
         "statusPurpose",
         "statusListIndex",

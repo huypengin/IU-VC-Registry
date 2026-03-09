@@ -104,8 +104,21 @@
     },
 
     "credentialStatus": {
-      "description": "Status object.",
-      "type": "object"
+      "description": "StatusList2021Entry for revocation status.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uri" },
+        "type": { "type": "string", "enum": ["StatusList2021Entry"] },
+        "statusPurpose": { "type": "string", "enum": ["revocation"] },
+        "statusListIndex": { "type": "string", "pattern": "^[0-9]+$" },
+        "statusListCredential": { "type": "string", "format": "uri" }
+      },
+      "required": [
+        "type",
+        "statusPurpose",
+        "statusListIndex",
+        "statusListCredential"
+      ]
     },
 
     "credentialSubject": {

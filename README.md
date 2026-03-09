@@ -182,7 +182,7 @@ npm run registry:validate
 # 2. Build the public/ folder
 npm run registry:build
 
-# 3. Build & run Docker (serving public/)
+# 3. Build & run Docker (serving static public/ assets only)
 npm run docker:up
 
 # 4. (In another terminal) Expose with ngrok
@@ -190,6 +190,28 @@ ngrok http 8080
 ```
 
 📖 **[Full Docker Deployment & ngrok Guide](.github/docs/docker-deployment-guide.md)**
+
+## Status List Revocation Operations
+
+Wallet-facing revocation now uses one canonical `StatusList2021Entry` contract:
+
+- `statusListCredential = https://<registry-host>/status/<category>/<year>/status-list.json`
+- `statusListIndex = <decimal string>`
+- `credentialStatus.id` is optional, but if present it must equal
+  `${statusListCredential}#${statusListIndex}`
+
+The registry keeps authored reference shapes in `src/registry/**` and generated static output in
+`public/**`, but live revocation state does **not** come from the checked-in `src/registry/status/**`
+files. Live wallet-visible revocation only works when `/status/**` is backed by the runtime status
+service plus writable storage.
+
+Operationally this means:
+
+- `npm run registry:build`, `npm run docker:up`, and the nginx image only publish static files.
+- Static-only hosting is sufficient for contexts/schemas/DID documents, but **not** for live revocation updates.
+- Live revocation requires the Node runtime path that can mutate `/status/**` at the same stable
+  `status-list.json` URL, or an equivalent writable persistent backing store.
+- `/status/**` is intentionally short-lived / revalidatable; contexts and schemas can stay longer-lived.
 
 ## ⚙️ Configuration
 
