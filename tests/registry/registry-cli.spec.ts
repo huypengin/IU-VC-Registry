@@ -8,11 +8,38 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { SAMPLE_IUSMARTCERT_VC } from '../../src/examples/iu-smartcert-v1.sample.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '../..');
 const TMP_TEST_DIR = path.join(ROOT, 'tmp', 'test-registry-cli');
+const DEGREE_SCHEMA_PATH = path.join(
+  ROOT,
+  'src',
+  'registry',
+  'credentialSchema',
+  'iu-edu-degree-v1.schema.json'
+);
+const DEGREE_CONTEXT_PATH = path.join(
+  ROOT,
+  'src',
+  'registry',
+  'contexts',
+  'iu-edu-degree-v1.jsonld'
+);
+const PUBLIC_DEGREE_CONTEXT_PATH = path.join(
+  ROOT,
+  'public',
+  'contexts',
+  'iu-edu-degree-v1.jsonld'
+);
+const CREDENTIAL_ISSUANCE_EXAMPLE_PATH = path.join(
+  ROOT,
+  'src',
+  'examples',
+  'credential-issuance-example.ts'
+);
 
 // Helper to run CLI commands
 function runCli(command: string): { stdout: string; stderr: string; status: number } {
@@ -35,6 +62,14 @@ function runCli(command: string): { stdout: string; stderr: string; status: numb
       status: error.status ?? 1
     };
   }
+}
+
+function readDegreeSchema() {
+  return JSON.parse(fs.readFileSync(DEGREE_SCHEMA_PATH, 'utf8'));
+}
+
+function readJsonFile(filePath: string) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
 describe('Registry CLI', () => {
@@ -68,6 +103,52 @@ describe('Registry CLI', () => {
       const hasSuccess = result.status === 0 || result.stdout.includes('✅');
       expect(hasSuccess).toBe(true);
       expect(result.stdout).toContain('DID documents have did:web: ids');
+    });
+
+    it('should require the canonical degree credential type set in the schema', () => {
+      const schema = readDegreeSchema();
+      const typeProperty = schema.properties.type;
+
+      expect(typeProperty.type).toBe('array');
+      expect(typeProperty.minItems).toBe(4);
+      expect(typeProperty.allOf).toEqual(
+        expect.arrayContaining([
+          { contains: { const: 'VerifiableCredential' } },
+          { contains: { const: 'UniversityDegree' } },
+          { contains: { const: 'EducationalOccupationalCredential' } },
+          { contains: { const: 'VNEduDegreeCredential' } }
+        ])
+      );
+    });
+
+    it('should publish degree context terms for semantic and interoperability types', () => {
+      const srcContext = readJsonFile(DEGREE_CONTEXT_PATH);
+      const publicContext = readJsonFile(PUBLIC_DEGREE_CONTEXT_PATH);
+
+      expect(srcContext).toEqual(publicContext);
+      expect(srcContext['@context'].EducationalOccupationalCredential).toBe(
+        'schema:EducationalOccupationalCredential'
+      );
+      expect(srcContext['@context'].UniversityDegree).toBe('vnEdu:UniversityDegree');
+      expect(srcContext['@context'].VNEduDegreeCredential).toBe('vnEdu:VNEduDegreeCredential');
+    });
+
+    it('should keep SmartCert examples aligned with the canonical degree type set', () => {
+      expect(SAMPLE_IUSMARTCERT_VC.type).toEqual(
+        expect.arrayContaining([
+          'VerifiableCredential',
+          'UniversityDegree',
+          'EducationalOccupationalCredential',
+          'VNEduDegreeCredential',
+          'IUSmartCertCredential'
+        ])
+      );
+
+      const credentialIssuanceExample = fs.readFileSync(CREDENTIAL_ISSUANCE_EXAMPLE_PATH, 'utf8');
+      expect(credentialIssuanceExample).not.toContain('IUEducationDegreeCredential');
+      expect(credentialIssuanceExample).toContain('UniversityDegree');
+      expect(credentialIssuanceExample).toContain('EducationalOccupationalCredential');
+      expect(credentialIssuanceExample).toContain('VNEduDegreeCredential');
     });
   });
 

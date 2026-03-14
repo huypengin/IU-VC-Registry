@@ -1,0 +1,8 @@
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    exclude: ['.worktrees/**', 'node_modules/**', 'dist/**', 'coverage/**'],
+    testTimeout: 15000,
+  },
+});

@@ -37,7 +37,12 @@ export async function issueCredentialWithStatus(studentData: {
       'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/iu-edu-degree-v1.jsonld',
     ],
     id: credentialId,
-    type: ['VerifiableCredential', 'IUEducationDegreeCredential'],
+    type: [
+      'VerifiableCredential',
+      'UniversityDegree',
+      'EducationalOccupationalCredential',
+      'VNEduDegreeCredential',
+    ],
     issuer: 'did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle',
     issuanceDate: new Date().toISOString(),
     
@@ -99,7 +104,12 @@ export async function issueBatchCredentials(students: Array<{
         'https://infra-vc-registry-web-911368042037.asia-east2.run.app/contexts/iu-edu-degree-v1.jsonld',
       ],
       id: credentialId,
-      type: ['VerifiableCredential', 'IUEducationDegreeCredential'],
+      type: [
+        'VerifiableCredential',
+        'UniversityDegree',
+        'EducationalOccupationalCredential',
+        'VNEduDegreeCredential',
+      ],
       issuer: 'did:web:infra-vc-registry-web-911368042037.asia-east2.run.app:issuers:principle',
       issuanceDate: new Date().toISOString(),
       credentialSubject: {
@@ -161,4 +171,3 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  *    - bit = 0: ✅ Valid (not revoked)
  *    - bit = 1: ❌ Revoked
  */
-

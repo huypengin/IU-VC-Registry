@@ -22,16 +22,15 @@
     },
 
     "type": {
-      "description": "VC types, must include VerifiableCredential and IU degree type.",
-      "oneOf": [
-        {
-          "type": "array",
-          "items": { "type": "string" },
-          "minItems": 1
-        },
-        {
-          "type": "string"
-        }
+      "description": "VC types, must include the canonical degree credential type set.",
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 4,
+      "allOf": [
+        { "contains": { "const": "VerifiableCredential" } },
+        { "contains": { "const": "UniversityDegree" } },
+        { "contains": { "const": "EducationalOccupationalCredential" } },
+        { "contains": { "const": "VNEduDegreeCredential" } }
       ]
     },
 

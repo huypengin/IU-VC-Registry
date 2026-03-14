@@ -9,7 +9,9 @@
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "vnEdu": "https://vc-registry.test/vocab/vn-edu#",
 
-    "DegreeCredential": "vnEdu:DegreeCredential",
+    "EducationalOccupationalCredential": "schema:EducationalOccupationalCredential",
+    "UniversityDegree": "vnEdu:UniversityDegree",
+    "VNEduDegreeCredential": "vnEdu:VNEduDegreeCredential",
 
     "degreeName": "vnEdu:degreeName",
     "degreeType": "vnEdu:degreeType",
