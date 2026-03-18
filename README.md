@@ -174,6 +174,23 @@ npm run docker:logs
 npm run docker:down
 ```
 
+#### Cross-Repo Sync
+```bash
+# Check whether IU-cert-university's mirrored registry contract is out of sync
+npm run sync:iu-cert-university
+
+# Copy the canonical registry contract files into IU-cert-university
+npm run sync:iu-cert-university -- --write
+
+# Invoke Codex CLI in IU-cert-university to adapt local schemas/examples/tests/docs
+npm run sync:iu-cert-university:adapt
+```
+
+The sync command mirrors only the canonical registry contract files into
+`../IU-cert-university/src/schemas/registry-mirror/`. The follow-up Codex command
+is for downstream adaptation inside `IU-cert-university`; it does not replace the
+deterministic file sync.
+
 #### Typical workflow:
 ```bash
 # 1. Validate all contexts, schemas, DID docs
@@ -187,6 +204,19 @@ npm run docker:up
 
 # 4. (In another terminal) Expose with ngrok
 ngrok http 8080
+```
+
+#### Registry Contract Change Workflow:
+```bash
+# 1. Update the canonical registry contract in this repo
+npm test
+npm run build
+
+# 2. Mirror the changed contract files into IU-cert-university
+npm run sync:iu-cert-university -- --write
+
+# 3. Let Codex adapt downstream copies in IU-cert-university
+npm run sync:iu-cert-university:adapt
 ```
 
 📖 **[Full Docker Deployment & ngrok Guide](.github/docs/docker-deployment-guide.md)**

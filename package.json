@@ -35,7 +35,9 @@
     "generate:issuer:dev": "node --loader ts-node/esm ./src/registry/issuers/helper/keyGenerator.ts generate",
     "generate:multikey:env": "node --loader ts-node/esm tools/generate-multikey-env.ts",
     "registry:validate": "node --loader ts-node/esm tools/registry-cli.ts validate",
-    "registry:build": "node --loader ts-node/esm tools/registry-cli.ts build"
+    "registry:build": "node --loader ts-node/esm tools/registry-cli.ts build",
+    "sync:iu-cert-university": "node --loader ts-node/esm tools/sync-iu-cert-university.ts sync",
+    "sync:iu-cert-university:adapt": "node --loader ts-node/esm tools/sync-iu-cert-university.ts adapt"
   },
   "keywords": [],
   "author": "",
