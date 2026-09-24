@@ -1,5 +1,8 @@
 # DID Web Creation System
 
+> This project is based on [Original Repository](https://github.com/nathang0147/IU-VC-registry), which was developed as part of the original author's thesis.
+> The work in this repository is independently developed as part of my own thesis, with modifications and extensions to the original work.
+
 A complete TypeScript Node.js system for creating and serving W3C DID (Decentralized Identity) documents with ES256 / P-256 cryptography, HTTPS serving, and Docker deployment.
 
 ## 🏗️ Architecture Overview
