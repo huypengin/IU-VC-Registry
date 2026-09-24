@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: iu-vc-registry
+    name: iu-vc-did-registry
     runtime: docker
     plan: free
     region: singapore
