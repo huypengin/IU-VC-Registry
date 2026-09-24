@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: iu-vc-registry
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./infra/Dockerfile.nginx
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "80"
+      - key: REGISTRY_BASE_URL
+        sync: false
