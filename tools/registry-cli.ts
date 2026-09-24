@@ -247,6 +247,15 @@ program
         }
         copyDir(SRC, PUBLIC, rewrite);
 
+        // Ensure standard .well-known exists even if legacy source directory is .well-know
+        const wellKnownPath = path.join(PUBLIC, ".well-known");
+        const wellKnowPath = path.join(PUBLIC, ".well-know");
+        if (fs.existsSync(wellKnowPath) && !fs.existsSync(wellKnownPath)) {
+            copyDir(wellKnowPath, wellKnownPath, rewrite);
+        } else if (fs.existsSync(wellKnownPath) && !fs.existsSync(wellKnowPath)) {
+            copyDir(wellKnownPath, wellKnowPath, rewrite);
+        }
+
         console.log("✅ Build complete. public/ is ready for Docker/nginx.");
     });
 
